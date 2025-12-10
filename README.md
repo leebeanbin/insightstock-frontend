@@ -1,61 +1,122 @@
 # InsightStock Frontend
 
-AI 기반 금융 학습 플랫폼 프론트엔드
+AI 기반 금융 학습 플랫폼 프론트엔드 - Next.js 16 with Turbopack
 
-## 🚀 시작하기
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38bdf8)](https://tailwindcss.com/)
 
-### 설치
+---
+
+## 🚀 프로젝트 상태
+
+### ✅ 완료된 기능
+- **Dashboard**: 사용자 대시보드, 주요 지표, 최근 활동
+- **News & Feed**: 뉴스 피드, AI 분석, **Kindle-style 텍스트 하이라이팅** ⭐
+- **Education (Notes)**: 노트 관리, 뉴스 스크랩, 태그 시스템, 하이라이트 저장
+
+### 🚧 개발 진행 중
+- **Portfolio**: 포트폴리오 관리 및 성과 추적
+- **Chat**: AI 챗봇 기반 학습 지원
+- **Stocks**: 주식 검색, 상세 정보, 차트 분석
+- **Learning**: 학습 추천 및 진행 상황
+
+---
+
+## 📋 빠른 시작
+
+### 사전 요구사항
+
+- **Node.js** 20.x 이상
+- **pnpm** 8.x 이상
+- **백엔드 API** 실행 중 (http://localhost:3001)
+
+### 설치 및 실행
 
 ```bash
+# 1. 의존성 설치
 pnpm install
-```
 
-### 개발 서버 실행
+# 2. 환경 변수 설정
+cp .env.example .env.local
 
-```bash
+# 3. 개발 서버 실행 (Turbopack)
 pnpm dev
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 확인하세요.
+브라우저에서 http://localhost:3000 열기
 
 ### 빌드
 
 ```bash
+# 프로덕션 빌드
 pnpm build
-```
 
-### 프로덕션 실행
-
-```bash
+# 프로덕션 서버 실행
 pnpm start
 ```
+
+---
+
+## 🛠️ 기술 스택
+
+### Core
+- **Framework**: Next.js 16 (App Router)
+- **Build Tool**: Turbopack
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS 3.x
+
+### State & Data
+- **State Management**: React Query (TanStack Query)
+- **HTTP Client**: Axios
+- **Forms**: React Hook Form + Zod
+
+### UI & Design
+- **UI Components**: shadcn/ui + Radix UI
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Typography**: Pretendard (한글), Inter (영문)
+
+---
 
 ## 📁 프로젝트 구조
 
 ```
 insightstock-frontend/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx         # 루트 레이아웃
-│   ├── page.tsx           # Dashboard 페이지
-│   ├── providers.tsx      # React Query Provider
-│   └── globals.css        # 전역 스타일 및 디자인 토큰
-├── components/            # 컴포넌트 라이브러리
-│   ├── atoms/            # 기본 컴포넌트
-│   ├── molecules/        # 조합 컴포넌트
-│   └── organisms/        # 복합 컴포넌트
-└── lib/                  # 핵심 라이브러리
-    ├── repositories/     # Repository Layer (데이터 접근)
-    ├── services/         # Service Layer (비즈니스 로직)
-    ├── hooks/            # Controller Layer (React Query)
-    ├── types/            # 타입 정의
-    │   └── api/          # API 타입
-    ├── api-client.ts     # Axios 클라이언트
-    └── mock-data/        # Mock 데이터
+├── app/                    # Next.js 16 App Router
+│   ├── dashboard/         # 대시보드 페이지 ✅
+│   ├── news/              # 뉴스 피드 & 하이라이팅 ✅
+│   ├── education/         # 노트 관리 ✅
+│   ├── portfolio/         # 포트폴리오 🚧
+│   ├── chat/              # AI 챗봇 🚧
+│   ├── stocks/            # 주식 정보 🚧
+│   └── layout.tsx         # 루트 레이아웃
+│
+├── components/            # React 컴포넌트
+│   ├── dashboard/        # 대시보드 컴포넌트
+│   ├── news/             # 뉴스 컴포넌트 (하이라이팅)
+│   ├── education/        # 노트 컴포넌트
+│   ├── common/           # 공통 컴포넌트
+│   └── ui/               # shadcn/ui 컴포넌트
+│
+├── lib/                  # 유틸리티 & 비즈니스 로직
+│   ├── hooks/           # Custom React Hooks
+│   ├── services/        # API 서비스 레이어
+│   ├── repositories/    # 데이터 액세스 레이어
+│   ├── types/           # TypeScript 타입
+│   ├── utils/           # 유틸리티 함수
+│   └── contexts/        # React Context
+│
+└── docs/                # 프로젝트 문서
+
+✅ = 완료  🚧 = 개발 중
 ```
+
+---
 
 ## 🏗️ 아키텍처
 
-**3-Layer Architecture + SOLID 원칙 준수**
+**3-Layer Architecture**
 
 ```
 Controller Layer (React Query Hooks)
@@ -68,21 +129,75 @@ Repository Layer (데이터 접근)
 ### 사용 예시
 
 ```typescript
-// React Query Hook 사용 (권장)
-import { usePortfolios, useCreatePortfolio } from '@/lib/hooks/use-portfolio';
+// React Query Hook 사용
+import { useNotes, useCreateNote } from '@/lib/hooks/use-notes';
 
-function PortfolioList() {
-  const { data, isLoading } = usePortfolios();
-  const createMutation = useCreatePortfolio();
+function NoteList() {
+  const { data: notes, isLoading } = useNotes();
+  const createMutation = useCreateNote();
+
   // ...
 }
 ```
 
 자세한 내용은 [lib/ARCHITECTURE.md](./lib/ARCHITECTURE.md)를 참조하세요.
 
+---
+
+## ⭐ 핵심 기능: Kindle-style 텍스트 하이라이팅
+
+뉴스 기사에서 텍스트를 선택하면 영구적으로 하이라이트되는 기능
+
+### 작동 방식
+
+1. 뉴스 기사에서 텍스트 드래그
+2. 팝업에서 "노트 만들기" 클릭
+3. 선택한 텍스트로 노트 생성
+4. 텍스트 위치가 **문자 오프셋**으로 저장됨 (`highlightStart`, `highlightEnd`)
+5. 페이지 새로고침 후에도 하이라이트 유지 ✨
+
+### 구현 세부사항
+
+**관련 파일:**
+- `components/news/NewsWithNotes.tsx` - 하이라이트 렌더링
+- `components/education/NoteModal.tsx` - 노트 생성
+- `lib/types.ts` - Note 인터페이스
+
+**데이터베이스 스키마:**
+```typescript
+interface Note {
+  id: string;
+  title: string;
+  content: string;
+  highlightStart?: number;  // 시작 문자 오프셋
+  highlightEnd?: number;    // 종료 문자 오프셋
+  newsId?: string;
+  // ...
+}
+```
+
+### 주요 버그 수정
+
+**문제**: `highlightStart: 0`이 백엔드에서 `undefined`로 처리됨
+
+**원인**: JavaScript의 falsy 값 처리
+```typescript
+// ❌ 잘못된 방법
+highlightStart || undefined  // 0 || undefined → undefined
+
+// ✅ 올바른 방법
+highlightStart ?? undefined  // 0 ?? undefined → 0
+```
+
+**해결**: Nullish coalescing operator (`??`) 사용
+- 프론트엔드: `NewsWithNotes.tsx`, `NoteModal.tsx`
+- 백엔드: `NoteService.ts` (4곳 수정)
+
+---
+
 ## 🎨 디자인 시스템
 
-### 색상
+### 색상 팔레트
 
 - **Primary**: `#16A362` (브랜드 컬러)
 - **Semantic**: Red, Blue, Yellow, Green
@@ -93,7 +208,7 @@ function PortfolioList() {
 - **한글**: Pretendard (400, 600, 700)
 - **영문/숫자**: Inter (400, 600, 700)
 
-### 간격
+### 간격 시스템
 
 8px 배수 기반:
 - `xs`: 4px
@@ -103,129 +218,94 @@ function PortfolioList() {
 - `xl`: 32px
 - `2xl`: 48px
 
-## 📦 주요 컴포넌트
 
-### Button
+---
 
-```tsx
-<Button variant="primary" size="medium">
-  버튼
-</Button>
+## 🛠️ 개발 명령어
+
+```bash
+# 개발
+pnpm dev              # 개발 서버 실행 (Turbopack)
+pnpm dev:turbo        # Turbopack 명시적 사용
+
+# 빌드
+pnpm build            # 프로덕션 빌드
+pnpm start            # 프로덕션 서버 실행
+
+# 코드 품질
+pnpm lint             # ESLint 실행
+pnpm lint:fix         # ESLint 자동 수정
+pnpm type-check       # TypeScript 타입 체크
+
+# 테스트
+pnpm test             # 단위 테스트 (Vitest)
+pnpm test:watch       # 테스트 watch 모드
+pnpm test:e2e         # E2E 테스트 (Playwright)
+
+# 의존성
+pnpm install          # 의존성 설치
+pnpm clean            # 캐시 및 빌드 삭제
 ```
 
-### Input
+---
 
-```tsx
-<Input
-  label="검색"
-  placeholder="종목명 또는 코드 검색"
-  prefix={<SearchIcon />}
-/>
+## 📚 문서
+
+- **[Quick Start](./docs/QUICK-START.md)** - 5분 안에 시작하기
+- **[Architecture](./lib/ARCHITECTURE.md)** - 아키텍처 설명
+- **[Docs](./docs/README.md)** - 전체 문서 목록
+
+---
+
+## 🐛 트러블슈팅
+
+### 개발 서버가 시작되지 않을 때
+
+```bash
+# 캐시 삭제 및 재설치
+rm -rf node_modules .next
+pnpm install
+
+# 포트 확인
+lsof -i :3000
+
+# 다른 포트로 실행
+pnpm dev -- -p 3001
 ```
 
-### Card
+### API 연결 오류
 
-```tsx
-<Card variant="elevated">
-  내용
-</Card>
+1. 백엔드 서버 실행 확인: `curl http://localhost:3001/health`
+2. `.env.local` 파일의 `NEXT_PUBLIC_API_URL` 확인
+3. CORS 설정 확인 (백엔드)
+
+### 빌드 오류
+
+```bash
+# 타입 체크
+pnpm type-check
+
+# 린트 수정
+pnpm lint:fix
+
+# 캐시 삭제 후 빌드
+rm -rf .next && pnpm build
 ```
 
-## 🛠️ 기술 스택
+자세한 내용은 [docs/QUICK-START.md](./docs/QUICK-START.md)의 트러블슈팅 섹션을 참조하세요.
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **State Management**: Zustand
-- **Data Fetching**: React Query (@tanstack/react-query)
-- **HTTP Client**: Axios
-- **Forms**: React Hook Form + Zod
-- **UI Components**: Radix UI
-- **Package Manager**: pnpm
+---
 
-## 🏛️ 아키텍처 원칙
+## 🤝 기여
 
-- **3-Layer Architecture**: Repository → Service → Hooks
-- **SOLID 원칙**: 모든 원칙 준수
-- **Dependency Injection**: Service에 Repository 주입
-- **Type Safety**: TypeScript로 타입 보장
+Private 프로젝트
 
-## 💾 데이터 소스 및 캐싱
+---
 
-### Prisma 데이터 소스
+## 📄 라이선스
 
-**백엔드 (insightstock-backend)**
-- 위치: `/insightstock-backend/prisma/seed.ts`
-- 역할: Prisma 데이터베이스에 Mock 주식 데이터 시드
-- 실행: `cd insightstock-backend && pnpm db:seed`
-- 데이터: 36개 인기 종목 (삼성전자, SK하이닉스 등)
+Private Project
 
-**프론트엔드 (Fallback)**
-- 위치: `/lib/api/krx.ts`
-- 역할: 백엔드 API 호출 실패 시 Mock 데이터 사용
-- 데이터: `POPULAR_STOCKS`, `BASE_PRICES` 상수
+---
 
-### 데이터 흐름
-
-**정상 흐름 (백엔드 실행 시)**
-1. 프론트엔드 → 백엔드 API (`http://localhost:3001/api/stocks/:code`)
-2. 백엔드 → Prisma DB 조회
-3. Prisma DB 없으면 → Naver API 호출 (현재 주석 처리)
-4. 백엔드 → 프론트엔드 데이터 반환
-
-**Fallback 흐름 (백엔드 미실행 시)**
-1. 프론트엔드 → 백엔드 API 호출 시도
-2. API 실패 → `lib/api/krx.ts` Mock 데이터 사용
-3. `BASE_PRICES` 기반 랜덤 변동 생성
-
-### 캐싱 전략
-
-데이터 타입별 캐시 시간이 자동으로 설정됩니다 (`lib/config/cache.ts`):
-
-| 데이터 타입 | 캐시 시간 | 설명 |
-|------------|---------|------|
-| **실시간 주가** | 10초 | 실시간 주가, 시장 지수 |
-| **차트/검색** | 30초 | 차트 데이터, 실시간 검색, 히스토리 |
-| **종목 목록/상세** | 1분 | 종목 목록, 종목 상세, 포트폴리오, 즐겨찾기, 대화 목록 |
-| **뉴스** | 5분 | 뉴스 목록, 포트폴리오 분석 |
-| **뉴스 상세** | 10분 | 뉴스 상세, AI 분석 |
-
-**React Query 캐싱**
-```typescript
-// 자동으로 적절한 캐시 시간 적용
-useQuery({
-  queryKey: stockKeys.list(params),
-  queryFn: () => stockService.getStocks(params),
-  ...getCacheConfig('stock', 'list'), // 1분 캐시
-});
-```
-
-**캐시 무효화**
-- Mutation 후: 관련 쿼리 자동 무효화
-- Window Focus: 실시간 주가만 포커스 시 refetch
-- Network Reconnect: 모든 쿼리 재연결 시 refetch
-
-자세한 내용은 [docs/DATA-SOURCE.md](./docs/DATA-SOURCE.md)를 참조하세요.
-
-## 📚 참고 문서
-
-### 📖 문서 인덱스
-- **[docs/README.md](./docs/README.md)** - 문서 전체 인덱스 및 가이드
-- **[docs/DOCUMENTATION-INDEX.md](./docs/DOCUMENTATION-INDEX.md)** - 상세 문서 인덱스
-
-### 🚀 시작하기
-- [docs/QUICK-START.md](./docs/QUICK-START.md) - 빠른 시작 가이드 (5분)
-- [docs/DEVELOPMENT-TODO.md](./docs/DEVELOPMENT-TODO.md) - 35일 체크리스트
-
-### 🏗️ 아키텍처 및 기술
-- [lib/ARCHITECTURE.md](./lib/ARCHITECTURE.md) - 3-Layer 아키텍처 상세 설명
-- [docs/DATA-SOURCE.md](./docs/DATA-SOURCE.md) - 데이터 소스 및 캐싱 전략 ⭐
-- [docs/TECHNICAL-SPECIFICATION.md](./docs/TECHNICAL-SPECIFICATION.md) - 기술 명세서 (통합)
-
-### 💻 개발 가이드
-- [docs/CODE-STANDARDS.md](./docs/CODE-STANDARDS.md) ⭐ - 코드 규칙 및 상태 관리 가이드
-- [docs/DEVELOPMENT-GUIDE.md](./docs/DEVELOPMENT-GUIDE.md) - 실전 개발 가이드 (통합)
-
-### 🎨 디자인 및 기획
-- [PROJECT-MVP.md](./PROJECT-MVP.md) - MVP 제품 기획서 (PRD)
-- [DESIGN-GUIDE.md](./DESIGN-GUIDE.md) - Figma Design System 가이드
+**Built with ❤️ by leebeanbin**

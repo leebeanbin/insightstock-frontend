@@ -1,73 +1,79 @@
 # 📚 InsightStock 문서
 
-> **프로젝트의 모든 문서를 한눈에 파악**
+프론트엔드 프로젝트 문서 모음
 
-<div align="center">
+---
 
-![Status](https://img.shields.io/badge/Status-Active-success)
-![Total Docs](https://img.shields.io/badge/Total%20Docs-16-blue)
+## 📄 문서 목록
 
-</div>
+### [⚡ QUICK-START.md](./QUICK-START.md)
+5분 안에 개발 환경 설정 및 실행하기
+
+**내용:**
+- 설치 및 실행 방법
+- 프로젝트 구조 설명
+- 개발 명령어
+- Kindle-style 하이라이팅 구현 설명
+- 트러블슈팅 가이드
 
 ---
 
 ## 🚀 빠른 시작
 
-| 문서 | 설명 | 시간 |
-|------|------|------|
-| [QUICK-START.md](./QUICK-START.md) | 5분 빠른 시작 | 5분 |
-| [CODE-STANDARDS.md](./CODE-STANDARDS.md) | 코드 규칙 및 상태 관리 | 15분 |
-| [ARCHITECTURE.md](../lib/ARCHITECTURE.md) | 아키텍처 이해 | 10분 |
+```bash
+# 1. 의존성 설치
+pnpm install
+
+# 2. 환경 변수 설정
+cp .env.example .env.local
+
+# 3. 개발 서버 실행
+pnpm dev
+```
+
+자세한 내용은 [QUICK-START.md](./QUICK-START.md)를 참조하세요.
 
 ---
 
-## 📑 문서 목록
+## 📊 프로젝트 상태
 
-### 🚀 시작하기
-- [QUICK-START.md](./QUICK-START.md) - 5분 빠른 시작 가이드
-- [DEVELOPMENT-TODO.md](./DEVELOPMENT-TODO.md) - 35일 체크리스트
+### ✅ 완료된 기능
+- **Dashboard**: 사용자 대시보드 및 통계
+- **News & Feed**: 뉴스 피드, AI 분석, Kindle-style 텍스트 하이라이팅
+- **Education (Notes)**: 노트 관리, 뉴스 스크랩, 하이라이트 저장
 
-### 🏗️ 아키텍처
-- [ARCHITECTURE.md](../lib/ARCHITECTURE.md) - 3-Layer 아키텍처
-- [TECHNICAL-SPECIFICATION.md](./TECHNICAL-SPECIFICATION.md) - 기술 명세서
-- [DATA-SOURCE.md](./DATA-SOURCE.md) - 데이터 소스 및 캐싱
-
-### 💻 개발 가이드
-- [CODE-STANDARDS.md](./CODE-STANDARDS.md) ⭐ - 코드 규칙 및 상태 관리
-- [DEVELOPMENT-GUIDE.md](./DEVELOPMENT-GUIDE.md) - 실전 개발 가이드
-- [USER-SCENARIOS.md](./USER-SCENARIOS.md) - 사용자 시나리오
-
-### 🎨 디자인
-- [DESIGN-GUIDE.md](../DESIGN-GUIDE.md) - Figma Design System
-- [design-tokens/README.md](../lib/design-tokens/README.md) - Design Tokens
-- [design-tokens/USAGE-EXAMPLES.md](../lib/design-tokens/USAGE-EXAMPLES.md) - 사용 예시
-
-### 📖 전체 인덱스
-- [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md) - 모든 문서 상세 인덱스
+### 🚧 개발 진행 중
+- Portfolio: 포트폴리오 관리
+- Chat: AI 챗봇
+- Stocks: 주식 검색 및 분석
+- Learning: 학습 추천
 
 ---
 
-## 🔍 문서 찾기
+## 🛠️ 기술 스택
 
-### 기능별 찾기
-
-| 기능 | 문서 |
-|------|------|
-| **코드 작성** | [CODE-STANDARDS.md](./CODE-STANDARDS.md) |
-| **상태 관리** | [CODE-STANDARDS.md](./CODE-STANDARDS.md) |
-| **디자인 토큰** | [design-tokens/README.md](../lib/design-tokens/README.md) |
-| **국제화** | [i18n/README.md](../lib/i18n/README.md) |
-| **API 통신** | [CODE-STANDARDS.md](./CODE-STANDARDS.md) |
-| **아키텍처** | [ARCHITECTURE.md](../lib/ARCHITECTURE.md) |
+- **Framework**: Next.js 16 (App Router)
+- **Build Tool**: Turbopack
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS 3.x
+- **State Management**: React Query
+- **UI Components**: shadcn/ui + Radix UI
 
 ---
 
-## 📊 문서 통계
+## 📖 추가 리소스
 
-- **총 문서 수**: 16개
-- **총 라인 수**: ~14,000+ 라인
-- **업데이트**: 2024.12
+- **프로젝트 README**: [../README.md](../README.md)
+- **아키텍처**: [../lib/ARCHITECTURE.md](../lib/ARCHITECTURE.md)
 
 ---
 
-**더 자세한 정보는 [DOCUMENTATION-INDEX.md](./DOCUMENTATION-INDEX.md)를 참조하세요.**
+## 🆘 도움이 필요하신가요?
+
+1. [QUICK-START.md](./QUICK-START.md)의 트러블슈팅 섹션 확인
+2. TypeScript 타입 에러는 `pnpm type-check`로 확인
+3. 린트 에러는 `pnpm lint --fix`로 자동 수정
+
+---
+
+**Happy Coding!** 🚀

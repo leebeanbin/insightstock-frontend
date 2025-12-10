@@ -1,474 +1,275 @@
-# ⚡ InsightStock — Quick Start Guide
-**5분 안에 개발 시작하기**
+# ⚡ Quick Start
+
+InsightStock 프론트엔드를 5분 안에 실행하기
 
 ---
 
-## 🎯 이 가이드의 목적
+## 📋 사전 요구사항
 
-"지금 당장 무엇을 해야 하나요?" → 이 문서가 답입니다.
-
----
-
-## 📚 문서 구조 한눈에 보기
-
-```
-📦 InsightStock Documentation Package
-│
-├── 📘 README.md                          ← 전체 문서 가이드
-├── ⚡ QUICK-START.md                     ← 이 문서 (시작점)
-├── 🎯 DEVELOPMENT-TODO.md                ← 일별 체크리스트 (35일)
-│
-├── 📋 기획 문서
-│   └── PROJECT-MVP.md                    (PM, 디자이너용)
-│
-├── 🔧 기술 문서
-│   ├── technical-spec-v2.md             (DB 스키마, API 명세)
-│   └── features-summary.md              (추가 기능 설명)
-│
-└── 💎 고급 개발 가이드
-    ├── advanced-dev-guide.md            (AI 챗봇, CRUD, 최적화)
-    └── advanced-dev-guide-part2.md      (에러 처리, 테스팅)
-```
+- **Node.js** 20.x 이상
+- **pnpm** 8.x 이상
+- **백엔드 API** 실행 중 (http://localhost:3001)
 
 ---
 
-## 🚀 3가지 시작 방법
+## 🚀 설치 및 실행
 
-### 방법 1: 순서대로 따라하기 (추천) ⭐
-
-```
-Day 1부터 차근차근 진행하고 싶다면:
-→ DEVELOPMENT-TODO.md 열기
-→ Day 1 체크리스트 완료
-→ Day 2 체크리스트 완료
-→ ...
-```
-
-**장점:** 놓치는 것 없이 체계적  
-**소요 시간:** 7주 (35일)
-
----
-
-### 방법 2: 핵심 기능만 빠르게 (MVP)
-
-```
-1주일 안에 프로토타입 만들고 싶다면:
-
-Day 1-2:  환경 설정 + DB
-Day 3-4:  Fastify + Auth
-Day 5-7:  AI 챗봇 (핵심!)
-```
-
-**집중할 문서:**
-- `DEVELOPMENT-TODO.md` (Day 1-10만)
-- `advanced-dev-guide.md` Section 1 (AI 챗봇)
-
-**건너뛸 수 있는 것:**
-- Portfolio, Favorites, History
-- 테스팅 (나중에)
-- 배포 (로컬만)
-
----
-
-### 방법 3: 특정 기능만 구현
-
-#### AI 챗봇만 만들고 싶다면:
-1. `DEVELOPMENT-TODO.md` Day 1-5 (환경 설정)
-2. `advanced-dev-guide.md` Section 1 (AI 챗봇)
-3. 코드 복사 → 붙여넣기 → 실행
-
-#### Portfolio CRUD만 만들고 싶다면:
-1. `DEVELOPMENT-TODO.md` Day 1-5 (환경 설정)
-2. `advanced-dev-guide.md` Section 2 (CRUD 패턴)
-3. `advanced-dev-guide-part2.md` Section 8 (완전한 예시)
-
-#### 검색 기능만 만들고 싶다면:
-1. `features-summary.md` 검색 섹션
-2. `advanced-dev-guide.md` Section 4 (Prisma 최적화)
-
----
-
-## 🎬 지금 바로 시작하기
-
-### 1단계: 환경 확인 (5분)
+### 1. 의존성 설치
 
 ```bash
-# 필수 도구 설치 확인
-node --version   # v20.x.x
-pnpm --version   # 8.x.x 이상
-docker --version # 24.x.x 이상
+pnpm install
+```
 
-# 모두 설치되어 있지 않다면?
-# → DEVELOPMENT-TODO.md Day 1 참조
+### 2. 환경 변수 설정
+
+`.env.local` 파일 생성:
+
+```bash
+# 백엔드 API URL
+NEXT_PUBLIC_API_URL=http://localhost:3001
+
+# WebSocket URL (선택)
+NEXT_PUBLIC_WS_URL=ws://localhost:3001
+```
+
+### 3. 개발 서버 실행
+
+```bash
+# Turbopack으로 개발 서버 시작
+pnpm dev
+```
+
+브라우저에서 http://localhost:3000 열기
+
+---
+
+## 📁 프로젝트 구조
+
+```
+insightstock-frontend/
+├── app/                    # Next.js 16 App Router
+│   ├── dashboard/         # 대시보드 페이지 ✅
+│   ├── news/              # 뉴스 피드 & 하이라이팅 ✅
+│   ├── education/         # 노트 관리 ✅
+│   ├── portfolio/         # 포트폴리오 🚧
+│   ├── chat/              # AI 챗봇 🚧
+│   └── stocks/            # 주식 정보 🚧
+│
+├── components/            # React 컴포넌트
+│   ├── dashboard/        # 대시보드 컴포넌트
+│   ├── news/             # 뉴스 컴포넌트
+│   ├── education/        # 노트 컴포넌트
+│   └── common/           # 공통 컴포넌트
+│
+├── lib/                  # 유틸리티 & 비즈니스 로직
+│   ├── hooks/           # Custom React Hooks
+│   ├── services/        # API 서비스 레이어
+│   ├── types/           # TypeScript 타입
+│   └── utils/           # 유틸리티 함수
+│
+└── docs/                # 프로젝트 문서
+
+✅ = 완료  🚧 = 개발 중
 ```
 
 ---
 
-### 2단계: 프로젝트 생성 (10분)
+## 🎯 주요 기능
 
-```bash
-# 1. 루트 디렉토리 생성
-mkdir insightstock && cd insightstock
+### ✅ 완료된 기능
 
-# 2. Backend 생성
-mkdir backend && cd backend
-pnpm init
-cd ..
+#### 1. Dashboard
+- 사용자 대시보드
+- 주요 지표 표시
+- 최근 활동 피드
 
-# 3. Frontend 생성 (Next.js)
-npx create-next-app@latest frontend
+#### 2. News & Feed
+- 뉴스 목록 (무한 스크롤)
+- 뉴스 상세 보기
+- AI 분석 및 요약
+- **Kindle-style 텍스트 하이라이팅** ⭐
 
-# 4. Docker 실행 (PostgreSQL + Redis)
-# → DEVELOPMENT-TODO.md Day 1 docker-compose.yml 복사
-docker-compose up -d
-```
+#### 3. Education (Notes)
+- 노트 생성/수정/삭제
+- 뉴스에서 텍스트 선택하여 노트 생성
+- 하이라이트 저장 및 표시
+- 태그 기반 분류
+
+### 🚧 개발 진행 중
+
+- Portfolio (포트폴리오 관리)
+- Chat (AI 챗봇)
+- Stocks (주식 검색 및 분석)
+- Learning (학습 추천)
 
 ---
 
-### 3단계: 첫 번째 API 만들기 (15분)
+## 🛠️ 개발 명령어
 
 ```bash
-cd backend
-
-# 1. 패키지 설치
-pnpm add fastify @fastify/cors @fastify/jwt prisma @prisma/client zod
-pnpm add -D typescript @types/node tsx
-
-# 2. TypeScript 초기화
-npx tsc --init
-
-# 3. Prisma 초기화
-npx prisma init
-
-# 4. 기본 파일 구조
-mkdir -p src/{routes,services,lib,dto,errors}
-touch src/index.ts src/app.ts .env
-
-# 5. app.ts 작성
-# → DEVELOPMENT-TODO.md Day 6 참조 (복사 붙여넣기)
-
-# 6. index.ts 작성
-# → DEVELOPMENT-TODO.md Day 6 참조
-
-# 7. 실행
-pnpm add -D tsx
+# 개발 서버 실행
 pnpm dev
 
-# 8. 확인
-# → http://localhost:3001/health
-```
+# 프로덕션 빌드
+pnpm build
 
-**성공 화면:**
-```json
-{"status":"ok","timestamp":"..."}
-```
+# 프로덕션 서버 실행
+pnpm start
 
----
+# 코드 린팅
+pnpm lint
 
-### 4단계: AI 챗봇 구현 (1-2일)
+# 타입 체크
+pnpm type-check
 
-```bash
-# 1. OpenAI API 키 발급
-# → https://platform.openai.com/api-keys
+# 단위 테스트
+pnpm test
 
-# 2. .env 설정
-OPENAI_API_KEY=sk-proj-...
-
-# 3. AIChatService 작성
-# → advanced-dev-guide.md Section 1.4 전체 복사
-
-# 4. Chat Routes 작성
-# → advanced-dev-guide.md Section 1.3
-
-# 5. 테스트
-curl -X POST http://localhost:3001/v1/chat/messages \
-  -H "Content-Type: application/json" \
-  -d '{"conversationId":"...","content":"PER이 뭔가요?"}'
+# E2E 테스트
+pnpm test:e2e
 ```
 
 ---
 
-## 📖 문서 읽는 순서
+## 🎨 주요 기술 스택
 
-### 처음 시작하는 개발자
-
-```
-1. ⚡ QUICK-START.md (이 문서)           ← 지금 여기
-2. 🎯 DEVELOPMENT-TODO.md (Day 1-5)     ← 환경 설정
-3. 📘 advanced-dev-guide.md (Section 1) ← AI 챗봇
-4. 🎯 DEVELOPMENT-TODO.md (Day 6-10)    ← 따라하기
-```
-
-### 경험 있는 개발자
-
-```
-1. 📋 technical-spec-v2.md              ← 전체 스펙 파악
-2. 💎 advanced-dev-guide.md (전체)      ← 아키텍처 이해
-3. 🎯 DEVELOPMENT-TODO.md               ← 필요한 부분만
-4. 💻 바로 개발 시작
-```
-
-### 특정 기능 담당자
-
-```
-AI 챗봇 담당:
-→ advanced-dev-guide.md Section 1
-
-Portfolio 담당:
-→ advanced-dev-guide.md Section 2
-→ advanced-dev-guide-part2.md Section 8
-
-검색 담당:
-→ features-summary.md
-→ advanced-dev-guide.md Section 4
-
-테스팅 담당:
-→ advanced-dev-guide-part2.md Section 7
-```
+- **Framework**: Next.js 16 (App Router)
+- **Build Tool**: Turbopack
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React Query (TanStack Query)
+- **UI Components**: shadcn/ui + Radix UI
+- **Icons**: Lucide React
+- **Charts**: Recharts
 
 ---
 
-## ⚠️ 자주 하는 실수
+## 🔑 핵심 구현: Kindle-style 텍스트 하이라이팅
 
-### ❌ 실수 1: 문서를 순서대로 안 읽음
-```
-기획 문서부터 읽지 마세요!
-→ 개발자는 DEVELOPMENT-TODO.md부터 시작
-```
+### 작동 방식
 
-### ❌ 실수 2: 환경 설정을 건너뜀
-```
-Docker 없이 진행하면 나중에 문제 발생
-→ Day 1-2는 반드시 완료
-```
+1. 뉴스 기사에서 텍스트 드래그
+2. 팝업에서 "노트 만들기" 클릭
+3. 선택한 텍스트로 노트 생성
+4. 텍스트 위치가 문자 오프셋으로 저장됨
+5. 페이지 새로고침 후에도 하이라이트 유지
 
-### ❌ 실수 3: 코드를 이해하려고 함
-```
-처음에는 복사-붙여넣기로 시작
-→ 동작 확인 후 천천히 이해
-```
+### 구현 파일
 
-### ❌ 실수 4: 테스팅을 나중으로 미룸
-```
-기능 구현과 동시에 테스트 작성
-→ 버그를 조기에 발견
-```
+- `components/news/NewsWithNotes.tsx` - 하이라이트 렌더링
+- `components/education/NoteModal.tsx` - 노트 생성
+- `lib/types.ts` - Note 인터페이스 (highlightStart, highlightEnd)
 
-### ❌ 실수 5: AI 챗봇을 Phase 2로 미룸
-```
-AI 챗봇이 MVP의 핵심입니다!
-→ Week 2에 반드시 구현
-```
+### 주요 버그 수정
 
----
+**문제**: `highlightStart: 0`이 `undefined`로 처리됨
 
-## 🎯 첫 주 목표
-
-### Day 1-2: 환경 설정
-- [ ] Node.js, Docker 설치
-- [ ] PostgreSQL + Redis 실행 확인
-- [ ] 프로젝트 구조 생성
-
-### Day 3-4: 데이터베이스
-- [ ] Prisma 스키마 작성 (300줄)
-- [ ] 마이그레이션 실행
-- [ ] Prisma Studio 확인
-
-### Day 5: 백엔드 기본
-- [ ] Fastify 앱 실행
-- [ ] /health 엔드포인트 확인
-- [ ] Redis 연결 확인
-
-**검증:**
-```bash
-# 모두 OK가 나와야 Week 2로 진행 가능
-curl http://localhost:3001/health
-redis-cli ping
-npx prisma studio
-```
-
----
-
-## 💡 빠른 팁
-
-### Prisma Schema 작성 시간 절약
-```bash
-# 문서에서 전체 스키마 복사 (300줄)
-# → advanced-dev-guide.md Section 1.2
-# 복사 → prisma/schema.prisma에 붙여넣기
-# → npx prisma migrate dev
-```
-
-### OpenAI API 비용 절약
+**원인**: JavaScript falsy 값 처리
 ```typescript
-// 캐싱 필수!
-await cached('ai:qa:${hash(question)}', 86400, async () => {
-  return await openai.chat.completions.create(...)
-})
+// ❌ 잘못된 방법
+highlightStart || undefined  // 0 || undefined → undefined
+
+// ✅ 올바른 방법
+highlightStart ?? undefined  // 0 ?? undefined → 0
 ```
 
-### 개발 속도 향상
-```bash
-# tsx watch 사용 (자동 재시작)
-pnpm add -D tsx
-pnpm dev # tsx watch src/index.ts
-
-# Prisma Studio (DB GUI)
-npx prisma studio
-```
+**해결**: Nullish coalescing operator (`??`) 사용
 
 ---
 
-## 🆘 도움이 필요할 때
+## 🐛 트러블슈팅
 
-### 에러가 발생하면?
-1. `DEVELOPMENT-TODO.md` 검증 섹션 확인
-2. `advanced-dev-guide-part2.md` 트러블슈팅 섹션
-3. Console 에러 메시지 복사 → 검색
-
-### 코드를 어디서 복사하나?
-- Auth: `DEVELOPMENT-TODO.md` Day 7-8
-- AI Chat: `advanced-dev-guide.md` Section 1.4
-- Portfolio: `advanced-dev-guide-part2.md` Section 8
-
-### 동작하지 않으면?
-```bash
-# 환경 확인
-node --version && docker ps && redis-cli ping
-
-# Prisma 확인
-npx prisma validate
-
-# 로그 확인
-pnpm dev (콘솔 출력 확인)
-```
-
----
-
-## 🎉 성공 기준
-
-### Week 1 완료 시
-- [ ] `curl http://localhost:3001/health` → OK
-- [ ] `npx prisma studio` → DB 테이블 보임
-- [ ] `redis-cli ping` → PONG
-
-### Week 2 완료 시
-- [ ] 회원가입/로그인 성공
-- [ ] AI 챗봇 응답 받음
-- [ ] PostgreSQL에 대화 저장 확인
-
-### Week 7 완료 시
-- [ ] Production 웹사이트 접속
-- [ ] 모든 기능 동작
-- [ ] 테스트 커버리지 > 80%
-
----
-
-## 🚦 다음 단계
-
-### 지금 바로:
-```bash
-# 1. DEVELOPMENT-TODO.md 열기
-# 2. Day 1 체크리스트 시작
-# 3. 하나씩 체크 ✅
-```
-
-### 막혔을 때:
-```
-1. 해당 Day의 "검증" 섹션 확인
-2. 에러 메시지 확인
-3. 관련 문서의 상세 섹션 읽기
-```
-
-### 완료 후:
-```
-1. 다음 Day로 진행
-2. 주차별 완료 체크리스트 확인
-3. Production 배포
-```
-
----
-
-## 📊 예상 시간
-
-| 작업 | 경험자 | 초보자 |
-|------|--------|--------|
-| **환경 설정** | 2시간 | 1일 |
-| **DB 스키마** | 3시간 | 2일 |
-| **Auth API** | 4시간 | 2일 |
-| **AI 챗봇** | 1일 | 3일 |
-| **Portfolio** | 1일 | 2일 |
-| **Frontend** | 2일 | 4일 |
-| **테스팅** | 2일 | 3일 |
-| **배포** | 1일 | 2일 |
-| **총계** | **2-3주** | **5-7주** |
-
----
-
-## 🎓 학습 경로
-
-### 주니어 개발자 (기초부터)
-```
-Week 1: 환경 + DB (천천히)
-Week 2-3: Auth + 기본 CRUD
-Week 4-5: AI 챗봇
-Week 6-7: Frontend
-Week 8-9: 테스팅 + 배포
-```
-
-### 미들 개발자 (속도 있게)
-```
-Week 1: 환경 + DB + Auth
-Week 2: AI 챗봇
-Week 3: Portfolio + Stock
-Week 4: Frontend
-Week 5: 테스팅
-Week 6-7: 최적화 + 배포
-```
-
-### 시니어 개발자 (아키텍처 중심)
-```
-Day 1-2: 전체 문서 리뷰
-Day 3-7: 핵심 기능 구현
-Week 2-3: 최적화 + 테스팅
-Week 4: 배포 + CI/CD
-```
-
----
-
-## ✅ 최종 체크리스트
-
-개발 시작 전:
-- [ ] QUICK-START.md 완독 (이 문서)
-- [ ] DEVELOPMENT-TODO.md 훑어보기
-- [ ] 필요한 계정 생성 (OpenAI, Pinecone)
-- [ ] VS Code + Extensions 설치
-- [ ] Docker Desktop 실행
-
-개발 중:
-- [ ] 매일 체크리스트 완료
-- [ ] 검증 단계 생략 금지
-- [ ] Git commit (매일)
-- [ ] 에러 즉시 해결
-
-배포 전:
-- [ ] 모든 테스트 통과
-- [ ] Secret 키 재생성
-- [ ] Environment Variables 확인
-- [ ] Health Check 엔드포인트 확인
-
----
-
-**이제 시작하세요!** 🚀
+### 개발 서버가 시작되지 않을 때
 
 ```bash
-# 첫 명령어
-cd ~/Projects
-mkdir insightstock
-cd insightstock
+# node_modules 삭제 후 재설치
+rm -rf node_modules .next
+pnpm install
 
-# 다음 문서 열기
-open DEVELOPMENT-TODO.md
+# 포트 확인 (3000번 포트가 사용 중인지)
+lsof -i :3000
+
+# 다른 포트로 실행
+pnpm dev -- -p 3001
 ```
 
-**화이팅!** 💪
+### API 연결 오류
+
+1. 백엔드 서버가 실행 중인지 확인
+2. `.env.local` 파일의 `NEXT_PUBLIC_API_URL` 확인
+3. CORS 설정 확인 (백엔드)
+
+### 빌드 오류
+
+```bash
+# 타입 에러 확인
+pnpm type-check
+
+# 린트 에러 수정
+pnpm lint --fix
+
+# 캐시 삭제
+rm -rf .next
+pnpm build
+```
+
+---
+
+## 📚 다음 단계
+
+### 새 페이지 추가하기
+
+```bash
+# 1. app/ 디렉토리에 새 폴더 생성
+mkdir app/my-page
+
+# 2. page.tsx 파일 생성
+touch app/my-page/page.tsx
+
+# 3. 컴포넌트 작성
+# app/my-page/page.tsx
+```
+
+### 새 API 훅 추가하기
+
+```typescript
+// lib/hooks/use-my-data.ts
+import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api-client';
+
+export function useMyData() {
+  return useQuery({
+    queryKey: ['myData'],
+    queryFn: async () => {
+      const response = await apiClient.get('/api/my-data');
+      return response.data;
+    },
+  });
+}
+```
+
+### 새 컴포넌트 추가하기
+
+```typescript
+// components/my-component/MyComponent.tsx
+export function MyComponent() {
+  return (
+    <div>
+      <h1>My Component</h1>
+    </div>
+  );
+}
+```
+
+---
+
+## 🆘 도움말
+
+- **프로젝트 README**: 전체 프로젝트 개요
+- **코드 문제**: TypeScript 타입 에러 확인
+- **API 이슈**: 백엔드 서버 로그 확인
+- **스타일 문제**: Tailwind CSS 문서 참조
+
+---
+
+**Happy Coding!** 🚀
