@@ -1,4 +1,4 @@
-# InsightStock Frontend
+# FinFolio Frontend
 
 AI 기반 금융 학습 플랫폼 프론트엔드 - Next.js 16 with Turbopack
 
@@ -38,7 +38,7 @@ AI 기반 금융 학습 플랫폼 프론트엔드 - Next.js 16 with Turbopack
 ```bash
 # 루트 디렉토리에서 전체 프로젝트 설정
 cd /Users/leejungbin/Downloads
-bash setup-insightstock.sh
+bash setup-finfolio.sh
 ```
 
 또는 프론트엔드만 설정:
@@ -110,7 +110,7 @@ pnpm start
 ## 📁 프로젝트 구조
 
 ```
-insightstock-frontend/
+finfolio-frontend/
 ├── app/                    # Next.js 16 App Router
 │   ├── dashboard/         # 대시보드 페이지 ✅
 │   ├── news/              # 뉴스 피드 & 하이라이팅 ✅

@@ -36,7 +36,12 @@
       "Bash(gh repo create:*)",
       "Bash(git remote add:*)",
       "Bash(git push:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(bash -n:*)",
+      "Bash(bash:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

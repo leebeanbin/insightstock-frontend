@@ -82,8 +82,8 @@ export interface SidebarProps {
               isCollapsed && 'justify-center'
             )}>
               {/* 로고 - 접혀있을 때도 항상 표시 */}
-              <Link 
-                href="/dashboard" 
+              <Link
+                href="/dashboard"
                 className={cn(
                   'flex items-center gap-3 shrink-0',
                   'hover:scale-[0.98] active:scale-[0.96] transition-all duration-200 ease-out',
@@ -91,12 +91,22 @@ export interface SidebarProps {
                   isCollapsed && 'justify-center'
                 )}
               >
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-md shrink-0">
-                  <TrendingUp size={20} className="text-white" strokeWidth={2.5} />
+                {/* FinFolio Logo */}
+                <div className="w-8 h-8 shrink-0">
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="16" cy="16" r="16" fill="#16A362"/>
+                    <path d="M10 9C10 8.44772 10.4477 8 11 8H15C15.5523 8 16 8.44772 16 9V23C16 23.5523 15.5523 24 15 24H11C10.4477 24 10 23.5523 10 23V9Z" fill="white" fillOpacity="0.9"/>
+                    <path d="M16 9C16 8.44772 16.4477 8 17 8H21C21.5523 8 22 8.44772 22 9V23C22 23.5523 21.5523 24 21 24H17C16.4477 24 16 23.5523 16 23V9Z" fill="white" fillOpacity="0.9"/>
+                    <rect x="17.5" y="18" width="1.5" height="4" rx="0.5" fill="#16A362"/>
+                    <rect x="19.5" y="15" width="1.5" height="7" rx="0.5" fill="#16A362"/>
+                    <rect x="21.5" y="13" width="1.5" height="9" rx="0.5" fill="#16A362"/>
+                    <path d="M14 8L14 12L15.5 10.5L17 12L17 8" fill="#FFD700" fillOpacity="0.8"/>
+                    <rect x="15.5" y="8" width="1" height="16" fill="white" fillOpacity="0.3"/>
+                  </svg>
                 </div>
                 {!isCollapsed && (
-                  <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 transition-all duration-300">
-                    InsightStock
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-[#16A362] to-[#12865A] bg-clip-text text-transparent transition-all duration-300">
+                    FinFolio
                   </h1>
                 )}
               </Link>

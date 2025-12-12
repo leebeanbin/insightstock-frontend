@@ -542,7 +542,7 @@ const translationsData: Record<Language, Translations> = {
     nav: {
       dashboard: '대시보드',
       news: '뉴스 & 피드',
-      education: '교육',
+      education: 'Folio',
       explore: '탐색',
       portfolio: '포트폴리오',
       favorites: '즐겨찾기',
@@ -1031,7 +1031,7 @@ const translationsData: Record<Language, Translations> = {
     nav: {
       dashboard: 'Dashboard',
       news: 'News & Feed',
-      education: 'Education',
+      education: 'Folio',
       explore: 'Explore',
       portfolio: 'Portfolio',
       favorites: 'Favorites',

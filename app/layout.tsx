@@ -5,8 +5,8 @@ import { Toaster } from "sonner";
 import { FloatingChatButton } from "@/components/common/FloatingChatButton";
 
 export const metadata: Metadata = {
-  title: "InsightStock - AI 기반 금융 학습 플랫폼",
-  description: "초보 투자자를 위한 AI 기반 금융 학습 플랫폼",
+  title: "FinFolio - AI 기반 금융 학습 플랫폼",
+  description: "뉴스 하이라이팅부터 AI 튜터까지, 나만의 금융 지식 포트폴리오",
 };
 
 export default function RootLayout({
