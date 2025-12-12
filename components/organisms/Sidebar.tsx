@@ -27,7 +27,7 @@ export interface NavItem {
 
 // 주요 네비게이션은 헤더로 이동, 사이드바에는 개인 기능만
 const mainNavItems: NavItem[] = [
-  { labelKey: 'nav.education', href: '/education', icon: GraduationCap },
+  { labelKey: 'nav.education', href: '/folio', icon: GraduationCap },
   { labelKey: 'nav.portfolio', href: '/portfolio', icon: Briefcase },
 ];
 

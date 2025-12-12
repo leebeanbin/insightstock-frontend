@@ -23,7 +23,7 @@ export default function ChatDetailPage() {
       const conversation = await createMutation.mutateAsync({
         title: '새 대화',
       });
-      router.push(`/chat/${conversation.id}`);
+      router.push(`/ai-lab/${conversation.id}`);
       toast.success('새 대화가 시작되었습니다.');
     } catch (error) {
       console.error('Failed to create conversation:', error);
@@ -33,9 +33,9 @@ export default function ChatDetailPage() {
 
   const handleSelect = (id: string) => {
     if (id) {
-      router.push(`/chat/${id}`);
+      router.push(`/ai-lab/${id}`);
     } else {
-      router.push('/chat');
+      router.push('/ai-lab');
     }
   };
 
