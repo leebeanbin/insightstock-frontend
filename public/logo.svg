@@ -1,20 +1,20 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background circle -->
-  <circle cx="16" cy="16" r="16" fill="#16A362"/>
+  <!-- Background circle with main brand color -->
+  <circle cx="16" cy="16" r="16" fill="#4E56C0"/>
 
   <!-- Book/Folio icon (left page) -->
-  <path d="M10 9C10 8.44772 10.4477 8 11 8H15C15.5523 8 16 8.44772 16 9V23C16 23.5523 15.5523 24 15 24H11C10.4477 24 10 23.5523 10 23V9Z" fill="white" fill-opacity="0.9"/>
+  <path d="M10 9C10 8.44772 10.4477 8 11 8H15C15.5523 8 16 8.44772 16 9V23C16 23.5523 15.5523 24 15 24H11C10.4477 24 10 23.5523 10 23V9Z" fill="white" fill-opacity="0.95"/>
 
   <!-- Chart/Finance icon (right page) -->
-  <path d="M16 9C16 8.44772 16.4477 8 17 8H21C21.5523 8 22 8.44772 22 9V23C22 23.5523 21.5523 24 21 24H17C16.4477 24 16 23.5523 16 23V9Z" fill="white" fill-opacity="0.9"/>
+  <path d="M16 9C16 8.44772 16.4477 8 17 8H21C21.5523 8 22 8.44772 22 9V23C22 23.5523 21.5523 24 21 24H17C16.4477 24 16 23.5523 16 23V9Z" fill="white" fill-opacity="0.95"/>
 
   <!-- Chart bars on right page -->
-  <rect x="17.5" y="18" width="1.5" height="4" rx="0.5" fill="#16A362"/>
-  <rect x="19.5" y="15" width="1.5" height="7" rx="0.5" fill="#16A362"/>
-  <rect x="21.5" y="13" width="1.5" height="9" rx="0.5" fill="#16A362"/>
+  <rect x="17.5" y="18" width="1.5" height="4" rx="0.5" fill="#4E56C0"/>
+  <rect x="19.5" y="15" width="1.5" height="7" rx="0.5" fill="#4E56C0"/>
+  <rect x="21.5" y="13" width="1.5" height="9" rx="0.5" fill="#4E56C0"/>
 
-  <!-- Bookmark accent -->
-  <path d="M14 8L14 12L15.5 10.5L17 12L17 8" fill="#FFD700" fill-opacity="0.8"/>
+  <!-- Bookmark accent with light purple -->
+  <path d="M14 8L14 12L15.5 10.5L17 12L17 8" fill="#D78FEE" fill-opacity="0.9"/>
 
   <!-- Center binding -->
   <rect x="15.5" y="8" width="1" height="16" fill="white" fill-opacity="0.3"/>
