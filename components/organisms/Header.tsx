@@ -120,7 +120,7 @@ const Header = ({ className, onStockSelect }: HeaderProps) => {
             onStockSelect={onStockSelect}
           />
         </div>
-        
+
         {/* 검색 바 - 오른쪽에 고정 */}
         <form onSubmit={handleSearch} className="relative w-56 shrink-0">
         <div

@@ -224,7 +224,7 @@ export function SearchModal({ isOpen, onClose, searchQuery: initialSearchQuery, 
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="absolute top-full left-0 mt-2 w-full bg-white dark:bg-gray-900 rounded-xl shadow-2xl z-50 border border-gray-200 dark:border-gray-800 max-h-[calc(100vh-100px)] overflow-hidden flex flex-col"
+            className="fixed top-16 left-1/2 -translate-x-1/2 w-full max-w-4xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-2xl z-50 border border-gray-200 dark:border-gray-800 max-h-[calc(100vh-100px)] overflow-hidden flex flex-col"
           >
         <div className="p-6 flex-shrink-0">
           {/* Header */}
