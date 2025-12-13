@@ -8,12 +8,14 @@ import Badge from '../atoms/Badge';
 import { formatRelativeTime } from '@/lib/formatters';
 import { News } from '@/lib/types';
 import { useToggleNewsLike, useToggleNewsFavorite, useLikedNews, useFavoriteNews } from '@/lib/hooks/use-user-activity';
-import { Heart, Star, BookOpen } from 'lucide-react';
+import { useNotes } from '@/lib/hooks/use-notes';
+import { Heart, Star, BookOpen, FileCheck } from 'lucide-react';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import { spacing, typography, borderRadius, sizes } from '@/lib/design-tokens';
 import Tooltip from '@/components/atoms/Tooltip';
 import { TextSelectionPopover } from './TextSelectionPopover';
 import { ContextMenu } from './ContextMenu';
+import Badge from '../atoms/Badge';
 
 export interface NewsCardProps {
   news: News;
@@ -28,9 +30,14 @@ const NewsCard = ({ news, onClick, className }: NewsCardProps) => {
   const { mutate: toggleFavorite, isPending: isFavoriting } = useToggleNewsFavorite();
   const { data: likedNews = [] } = useLikedNews();
   const { data: favoriteNews = [] } = useFavoriteNews();
-  
+  const { data: notesData } = useNotes();
+
   const isLiked = Array.isArray(likedNews) && likedNews.includes(news.id);
   const isFavorite = Array.isArray(favoriteNews) && favoriteNews.includes(news.id);
+
+  // 이 뉴스에 연결된 노트 개수 확인
+  const notesCount = notesData?.notes?.filter(note => note.newsId === news.id).length || 0;
+  const hasNotes = notesCount > 0;
   
   // 텍스트 선택 관련 상태
   const [selectedText, setSelectedText] = useState<string>('');
@@ -225,10 +232,22 @@ const NewsCard = ({ news, onClick, className }: NewsCardProps) => {
 
       {/* Content */}
       <div className="flex-1 flex flex-col space-y-2">
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-[var(--brand-main)] dark:hover:text-[var(--brand-purple)] transition-colors cursor-pointer leading-snug">
-          {news.title}
-        </h3>
+        {/* Title with Note Badge */}
+        <div className="flex items-start gap-2">
+          <h3 className="flex-1 text-lg font-semibold text-gray-900 line-clamp-2 hover:text-[var(--brand-main)] dark:hover:text-[var(--brand-purple)] transition-colors cursor-pointer leading-snug">
+            {news.title}
+          </h3>
+          {hasNotes && (
+            <Tooltip content={`${notesCount}개의 노트`} position="left">
+              <div className="flex-shrink-0">
+                <Badge variant="primary" size="small">
+                  <FileCheck size={12} className="mr-1" />
+                  {notesCount}
+                </Badge>
+              </div>
+            </Tooltip>
+          )}
+        </div>
 
         {/* Summary */}
         {news.summary && (

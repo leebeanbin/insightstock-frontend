@@ -12,6 +12,7 @@ import { NewsList } from '@/components/news/NewsList';
 import { MarketIndices } from '@/components/dashboard/MarketIndices';
 import { useFavorites } from '@/lib/hooks/use-favorites';
 import { usePortfolios } from '@/lib/hooks/use-portfolio';
+import { useNotes } from '@/lib/hooks/use-notes';
 import { trackView } from '@/lib/utils/trackView';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
 import { formatPrice, formatChange, getChangeColorClass } from '@/lib/formatters';
@@ -24,6 +25,7 @@ export default function NewsPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const [sentiment, setSentiment] = useState<NewsSentimentFilter>('all');
+  const [showNotesOnly, setShowNotesOnly] = useState(false);
 
   // 뉴스 데이터 조회 (무한 스크롤)
   const {
@@ -42,11 +44,24 @@ export default function NewsPage() {
   const { data: favoritesData } = useFavorites();
   const { data: portfoliosData } = usePortfolios();
 
+  // 노트 데이터 조회
+  const { data: notesData } = useNotes();
+
   // 모든 페이지의 뉴스를 하나의 배열로 합치기
   const allNews = useMemo(() => {
     if (!data?.pages) return [];
-    return (data.pages as NewsListResponse[]).flatMap((page) => page.news);
-  }, [data]);
+    let news = (data.pages as NewsListResponse[]).flatMap((page) => page.news);
+
+    // 노트한 기사만 필터링
+    if (showNotesOnly && notesData?.notes) {
+      const newsIdsWithNotes = new Set(
+        notesData.notes.filter(note => note.newsId).map(note => note.newsId)
+      );
+      news = news.filter(item => newsIdsWithNotes.has(item.id));
+    }
+
+    return news;
+  }, [data, showNotesOnly, notesData]);
 
   // 좋아요와 포트폴리오 종목을 합쳐서 중복 제거 및 타입 변환
   const myStocks = useMemo(() => {
@@ -315,6 +330,9 @@ export default function NewsPage() {
               <NewsFilter
                 sentiment={sentiment}
                 onSentimentChange={setSentiment}
+                showNotesOnly={showNotesOnly}
+                onShowNotesOnlyChange={setShowNotesOnly}
+                notesCount={notesData?.notes?.filter(note => note.newsId).length || 0}
               />
             </div>
 

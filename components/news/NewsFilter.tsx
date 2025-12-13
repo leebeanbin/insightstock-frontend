@@ -7,17 +7,24 @@
 
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
+import { FileCheck } from 'lucide-react';
 
 export type NewsSentimentFilter = 'all' | 'positive' | 'negative' | 'neutral';
 
 interface NewsFilterProps {
   sentiment: NewsSentimentFilter;
   onSentimentChange: (sentiment: NewsSentimentFilter) => void;
+  showNotesOnly?: boolean;
+  onShowNotesOnlyChange?: (show: boolean) => void;
+  notesCount?: number;
 }
 
 export function NewsFilter({
   sentiment,
   onSentimentChange,
+  showNotesOnly = false,
+  onShowNotesOnlyChange,
+  notesCount = 0,
 }: NewsFilterProps) {
   const { t } = useLanguage();
   const sentiments: { value: NewsSentimentFilter; label: string }[] = [
@@ -28,25 +35,60 @@ export function NewsFilter({
   ];
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      {sentiments.map((item) => {
-        const isActive = sentiment === item.value;
-        return (
+    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      {/* 감정 필터 */}
+      <div className="flex items-center gap-2">
+        {sentiments.map((item) => {
+          const isActive = sentiment === item.value;
+          return (
+            <button
+              key={item.value}
+              onClick={() => onSentimentChange(item.value)}
+              className={cn(
+                'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
+                'focus:outline-none focus:ring-2 focus:ring-offset-2',
+                isActive
+                  ? 'bg-[#4E56C0] dark:bg-[#9b5DE0] text-white shadow-sm'
+                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+              )}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 구분선 */}
+      {onShowNotesOnlyChange && (
+        <>
+          <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
+
+          {/* 노트한 기사만 필터 */}
           <button
-            key={item.value}
-            onClick={() => onSentimentChange(item.value)}
+            onClick={() => onShowNotesOnlyChange(!showNotesOnly)}
             className={cn(
-              'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap',
+              'px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap flex items-center gap-2',
               'focus:outline-none focus:ring-2 focus:ring-offset-2',
-              isActive
-                ? 'bg-[var(--brand-main)] dark:bg-[var(--brand-purple)] text-white shadow-sm'
-                : 'bg-[var(--background-card)] dark:bg-gray-800 text-[var(--text-secondary)] dark:text-gray-300 hover:bg-[var(--background-hover)] dark:hover:bg-gray-700 border border-[var(--border-default)] dark:border-gray-700'
+              showNotesOnly
+                ? 'bg-[#4E56C0] dark:bg-[#9b5DE0] text-white shadow-sm'
+                : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
             )}
           >
-            {item.label}
+            <FileCheck size={16} />
+            노트한 기사만
+            {notesCount > 0 && (
+              <span className={cn(
+                'ml-1 px-1.5 py-0.5 rounded-full text-xs font-bold',
+                showNotesOnly
+                  ? 'bg-white/20'
+                  : 'bg-[#4E56C0]/10 dark:bg-[#9b5DE0]/10 text-[#4E56C0] dark:text-[#9b5DE0]'
+              )}>
+                {notesCount}
+              </span>
+            )}
           </button>
-        );
-      })}
+        </>
+      )}
     </div>
   );
 }
