@@ -15,7 +15,6 @@ import { spacing, typography, borderRadius, sizes } from '@/lib/design-tokens';
 import Tooltip from '@/components/atoms/Tooltip';
 import { TextSelectionPopover } from './TextSelectionPopover';
 import { ContextMenu } from './ContextMenu';
-import Badge from '../atoms/Badge';
 
 export interface NewsCardProps {
   news: News;
