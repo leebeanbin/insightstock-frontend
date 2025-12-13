@@ -14,7 +14,7 @@ export interface BadgeProps {
 }
 
 const Badge = ({ variant = 'default', size = 'medium', dot = false, children, className }: BadgeProps) => {
-  // 토스 스타일: 더 부드럽고 미니멀한 색상 시스템
+  // 브랜드 컬러 기반 색상 시스템
   const variantStyles = {
     default: {
       bg: 'bg-gray-100 dark:bg-gray-800',
@@ -22,24 +22,24 @@ const Badge = ({ variant = 'default', size = 'medium', dot = false, children, cl
       dot: 'bg-gray-500 dark:bg-gray-400',
     },
     primary: {
-      bg: 'bg-[var(--brand-main)]/8 dark:bg-[var(--brand-purple)]/10',
-      text: 'text-[var(--brand-main)] dark:text-[var(--brand-purple)]',
-      dot: 'bg-[var(--brand-main)] dark:bg-[var(--brand-purple)]',
+      bg: 'bg-[#4E56C0]/10 dark:bg-[#9b5DE0]/15',
+      text: 'text-[#4E56C0] dark:text-[#9b5DE0]',
+      dot: 'bg-[#4E56C0] dark:bg-[#9b5DE0]',
     },
     warning: {
-      bg: 'bg-orange-50 dark:bg-orange-900/20',
-      text: 'text-orange-700 dark:text-orange-400',
-      dot: 'bg-orange-500 dark:bg-orange-400',
+      bg: 'bg-[#D78FEE]/15 dark:bg-[#D78FEE]/20',
+      text: 'text-[#9b5DE0] dark:text-[#D78FEE]',
+      dot: 'bg-[#9b5DE0] dark:bg-[#D78FEE]',
     },
     success: {
-      bg: 'bg-green-50 dark:bg-green-900/20',
-      text: 'text-green-700 dark:text-green-400',
-      dot: 'bg-green-500 dark:bg-green-400',
+      bg: 'bg-[#4E56C0]/8 dark:bg-[#4E56C0]/12',
+      text: 'text-[#4E56C0] dark:text-[#9b5DE0]',
+      dot: 'bg-[#4E56C0] dark:bg-[#9b5DE0]',
     },
     error: {
-      bg: 'bg-red-50 dark:bg-red-900/20',
-      text: 'text-red-700 dark:text-red-400',
-      dot: 'bg-red-500 dark:bg-red-400',
+      bg: 'bg-[#D78FEE]/20 dark:bg-[#D78FEE]/25',
+      text: 'text-[#9b5DE0] dark:text-[#D78FEE]',
+      dot: 'bg-[#9b5DE0] dark:bg-[#D78FEE]',
     },
   };
 

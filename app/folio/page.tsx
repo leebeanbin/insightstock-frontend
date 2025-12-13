@@ -1,245 +1,169 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Sidebar from '@/components/organisms/Sidebar';
 import Header from '@/components/organisms/Header';
-import Card from '@/components/molecules/Card';
 import Input from '@/components/atoms/Input';
 import Button from '@/components/atoms/Button';
 import Badge from '@/components/atoms/Badge';
-import { Send, BookOpen, Save } from 'lucide-react';
+import { Send, BookOpen, FileText, MessageSquare, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTodayRecommendations } from '@/lib/hooks/use-learning';
 import { useLanguage } from '@/lib/contexts/LanguageContext';
-import { LearningModal } from '@/components/education/LearningModal';
+import { useSendMessageStream } from '@/lib/hooks/use-chat';
+import { useNotes } from '@/lib/hooks/use-notes';
 import { NoteModal } from '@/components/education/NoteModal';
-import { useNotes, useCreateNote } from '@/lib/hooks/use-notes';
-import { Plus, X, ExternalLink } from 'lucide-react';
-import { useNewsDetail } from '@/lib/hooks/use-news';
-import { formatRelativeTime } from '@/lib/formatters';
-import { useSearchParams } from 'next/navigation';
 
-function EducationPageContent() {
-  const router = useRouter();
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+interface SelectedConcept {
+  concept: string;
+  description: string;
+  difficulty: string;
+  relatedStocks: string[];
+}
+
+function FolioPageContent() {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'qa' | 'notes'>('dashboard');
-  const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedLearning, setSelectedLearning] = useState<{
-    concept: string;
-    question: string;
-    relatedStocks: string[];
-  } | null>(null);
-  const [selectedNote, setSelectedNote] = useState<string | null>(null);
-  const [isCreatingNote, setIsCreatingNote] = useState(false);
-  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
-  const [noteViewMode, setNoteViewMode] = useState<'grid' | 'split'>('grid');
-  const searchParams = useSearchParams();
-  const { data: recommendations = [], isLoading: isRecommendationsLoading } = useTodayRecommendations();
-  const { data: notesData, isLoading: isNotesLoading } = useNotes();
-  const { data: selectedNews, isLoading: isNewsLoading } = useNewsDetail(selectedNewsId || '', {
-    enabled: !!selectedNewsId && noteViewMode === 'split',
-  });
 
-  // HTML과 마크다운을 제거하고 순수 텍스트만 추출하는 함수
-  const stripHtmlAndMarkdown = (html: string): string => {
-    // HTML 태그 제거
-    const withoutHtml = html.replace(/<[^>]*>/g, '');
-    // 마크다운 문법 제거 (#, *, `, [], etc.)
-    const withoutMarkdown = withoutHtml
-      .replace(/[#*`_~\[\]]/g, '')
-      .replace(/!\[.*?\]\(.*?\)/g, '') // 이미지
-      .replace(/\[.*?\]\(.*?\)/g, '') // 링크
-      .trim();
-    return withoutMarkdown;
+  // 상태 관리
+  const [selectedConcept, setSelectedConcept] = useState<SelectedConcept | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [showNotePanel, setShowNotePanel] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [conversationId] = useState(() => `learning-${Date.now()}`);
+
+  // 데이터 훅
+  const { data: recommendations = [], isLoading: isRecommendationsLoading } = useTodayRecommendations();
+  const { data: notesData } = useNotes();
+  const { sendMessage, streamingMessage, isStreaming } = useSendMessageStream();
+
+  // 스트리밍 메시지 업데이트
+  useEffect(() => {
+    if (streamingMessage) {
+      setMessages(prev => {
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage && lastMessage.role === 'assistant') {
+          return prev.slice(0, -1).concat([{ role: 'assistant', content: streamingMessage }]);
+        } else {
+          return [...prev, { role: 'assistant', content: streamingMessage }];
+        }
+      });
+    }
+  }, [streamingMessage]);
+
+  // 스크롤 자동 이동
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, streamingMessage]);
+
+  // 메시지 전송
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isStreaming) return;
+
+    const userMessage = inputMessage.trim();
+    setInputMessage('');
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    try {
+      await sendMessage({
+        conversationId,
+        message: userMessage,
+      });
+    } catch (error) {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: `오류가 발생했습니다: ${error instanceof Error ? error.message : 'Unknown error'}`
+      }]);
+    }
   };
 
-  // URL 파라미터에서 뉴스 ID 확인
-  useEffect(() => {
-    const newsId = searchParams.get('newsId');
-    if (newsId) {
-      setSelectedNewsId(newsId);
-      setActiveTab('notes');
-      setNoteViewMode('split');
-      setIsCreatingNote(true);
-    }
-  }, [searchParams]);
+  // 개념 선택
+  const handleSelectConcept = (concept: any) => {
+    setSelectedConcept(concept);
+    setMessages([]);
+    setInputMessage(`${concept.concept}에 대해 설명해주세요.`);
+  };
 
-  const tabs = [
-    { id: 'dashboard', labelKey: 'education.dashboard' },
-    { id: 'qa', labelKey: 'education.qa' },
-    { id: 'notes', labelKey: 'education.notes' },
-  ];
-
-  const handleSubmit = async () => {
-    if (!question.trim()) return;
-
-    setIsLoading(true);
-    // Simulate AI response
-    setTimeout(() => {
-      setAnswer(`
-PER은 주가를 주당순이익으로 나눈 지표입니다.
-
-왜 중요한가?
-기업의 밸류에이션을 평가하는 가장 기본적인 지표로, 주가가 비싼지 싼지 판단할 수 있어요.
-
-종목/업종 예시:
-• 삼성전자 PER: 15배 (2024년 기준)
-• IT 업종 평균: 20배
-
-실수하기 쉬운 포인트:
-PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계산할 수 없어요.
-      `);
-      setIsLoading(false);
-    }, 2000);
+  // 개념 선택 해제
+  const handleDeselectConcept = () => {
+    setSelectedConcept(null);
+    setMessages([]);
+    setInputMessage('');
+    setShowNotePanel(false);
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
       <Sidebar />
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
-        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
-          {/* Tabs - 토스 스타일: 깔끔한 탭바 */}
-          <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-            <div className="max-w-7xl mx-auto px-6">
+        {/* 토스 스타일: 깔끔한 상단 바 */}
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {selectedConcept ? (
+                  <>
+                    <button
+                      onClick={handleDeselectConcept}
+                      className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors flex items-center gap-1"
+                    >
+                      <ChevronLeft size={16} />
+                      개념 선택
+                    </button>
+                    <div className="h-4 w-px bg-gray-200 dark:bg-gray-800" />
+                    <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">{selectedConcept.concept}</h1>
+                    <Badge
+                      variant={
+                        selectedConcept.difficulty === 'beginner' ? 'success' :
+                        selectedConcept.difficulty === 'intermediate' ? 'warning' :
+                        'error'
+                      }
+                      size="small"
+                      dot
+                    >
+                      {t(`education.difficulty.${selectedConcept.difficulty}`)}
+                    </Badge>
+                  </>
+                ) : (
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">학습 개념 선택</h1>
+                )}
+              </div>
               <div className="flex items-center gap-2">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                    className={cn(
-                      'px-4 py-4 text-sm font-semibold transition-all duration-200 relative',
-                      activeTab === tab.id
-                        ? 'text-[var(--brand-main)] dark:text-[var(--brand-purple)]'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
-                    )}
-                  >
-                    {t(tab.labelKey)}
-                    {activeTab === tab.id && (
-                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--brand-main)] dark:bg-[var(--brand-purple)] rounded-full" />
-                    )}
-                  </button>
-                ))}
+                <Button
+                  variant="secondary"
+                  size="small"
+                  icon={FileText}
+                  onClick={() => setShowNotesModal(true)}
+                >
+                  내 노트 ({notesData?.notes?.length || 0})
+                </Button>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-hidden">
-            {activeTab === 'qa' && (
-              <div className="h-full flex flex-col">
-                <div className="flex-1 overflow-hidden grid grid-cols-[280px_1fr] gap-0">
-                  {/* Question History - 토스 스타일 */}
-                  <div className="bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
-                    <div className="p-6 space-y-4">
-                      <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">{t('education.question.history')}</h3>
-                      <div className="space-y-1">
-                        {[
-                          t('education.question.sample.per'),
-                          t('education.question.sample.dividend'),
-                          t('education.question.sample.rsi'),
-                          t('education.question.sample.dividend'),
-                          t('education.question.sample.rsi'),
-                        ].map((q, index) => (
-                          <button
-                            key={index}
-                            className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
-                          >
-                            {q}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Answer Preview - 토스 스타일 */}
-                  <div className="overflow-y-auto bg-gray-50 dark:bg-gray-950">
-                    {answer ? (
-                      <div className="max-w-3xl mx-auto p-8">
-                        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 mb-6">
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                            <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line space-y-4">
-                              {answer.split('\n\n').map((paragraph, index) => (
-                                <p key={index} className="text-sm leading-7">
-                                  {paragraph.trim()}
-                                </p>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Button
-                            variant="primary"
-                            size="medium"
-                            icon={Save}
-                            iconPosition="left"
-                          >
-                            {t('education.saveNote')}
-                          </Button>
-                          <Button variant="secondary" size="medium">
-                            {t('education.viewStocks')}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center max-w-md p-8">
-                          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            <BookOpen size={40} strokeWidth={2} className="text-gray-400 dark:text-gray-600" />
-                          </div>
-                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('education.question.input')}</h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-                            {t('education.question.inputDescription')}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Question Input - 토스 스타일 */}
-                <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shrink-0">
-                  <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center gap-3">
-                      <Input
-                        placeholder={t('education.question.placeholder')}
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            handleSubmit();
-                          }
-                        }}
-                        className="flex-1 min-w-0"
-                      />
-                      <Button
-                        variant="primary"
-                        size="medium"
-                        icon={Send}
-                        onClick={handleSubmit}
-                        disabled={!question.trim() || isLoading}
-                        className="shrink-0"
-                      >
-                        {isLoading ? t('education.question.generating') : t('common.submit')}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'dashboard' && (
-              <div className="max-w-7xl mx-auto p-6 space-y-8">
-                {/* 토스 스타일: 섹션 헤더 */}
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('education.today')}</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">오늘 배울 금융 개념을 선택해보세요</p>
+        {/* 메인 콘텐츠 */}
+        <div className="flex-1 overflow-hidden flex">
+          {!selectedConcept ? (
+            /* 개념 선택 화면 */
+            <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 p-6">
+              <div className="max-w-7xl mx-auto">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                    오늘의 학습 개념
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    금융 개념을 선택하고 AI와 대화하며 학습해보세요
+                  </p>
                 </div>
 
                 {isRecommendationsLoading ? (
@@ -251,7 +175,6 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                         <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-4 w-5/6" />
                         <div className="flex gap-2">
                           <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
-                          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
                         </div>
                       </div>
                     ))}
@@ -261,17 +184,11 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                     {recommendations.map((rec) => (
                       <button
                         key={rec.concept}
-                        onClick={() => {
-                          setSelectedLearning({
-                            concept: rec.concept,
-                            question: rec.question,
-                            relatedStocks: rec.relatedStocks,
-                          });
-                        }}
+                        onClick={() => handleSelectConcept(rec)}
                         className={cn(
                           'bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800',
                           'transition-all duration-200 cursor-pointer text-left',
-                          'hover:border-[var(--brand-main)] dark:hover:border-[var(--brand-purple)]',
+                          'hover:border-[#4E56C0] dark:hover:border-[#9b5DE0]',
                           'hover:shadow-lg hover:-translate-y-0.5',
                           'active:translate-y-0'
                         )}
@@ -310,224 +227,162 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                     <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                       <BookOpen className="w-8 h-8 text-gray-400 dark:text-gray-600" />
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400">{t('education.noRecommendations')}</p>
+                    <p className="text-gray-600 dark:text-gray-400">오늘의 학습 개념이 없습니다</p>
                   </div>
                 )}
               </div>
-            )}
-
-            {activeTab === 'notes' && (
-              <div className="h-full flex flex-col">
-                {noteViewMode === 'split' ? (
-                  // 분할 레이아웃 모드 - 토스 스타일
-                  <div className="flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-950">
-                    {/* 왼쪽: 뉴스 */}
-                    <div className="w-1/2 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-white dark:bg-gray-900">
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-6">
-                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{t('education.selectNews')}</h3>
-                          <Button
-                            variant="secondary"
-                            size="small"
-                            icon={X}
-                            onClick={() => {
-                              setNoteViewMode('grid');
-                              setSelectedNewsId(null);
-                              setIsCreatingNote(false);
-                              setSelectedNote(null);
-                            }}
-                          >
-                            {t('common.close')}
-                          </Button>
-                        </div>
-                        {selectedNewsId && selectedNews ? (
-                          <div className="space-y-4">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{selectedNews.title}</h2>
-                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                              <span className="font-medium">{selectedNews.source}</span>
-                              <span>·</span>
-                              <span>{formatRelativeTime(selectedNews.publishedAt)}</span>
-                            </div>
-                            {selectedNews.summary && (
-                              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{selectedNews.summary}</p>
-                              </div>
-                            )}
-                            <div className="prose prose-sm max-w-none dark:prose-invert">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
-                                {selectedNews.content}
-                              </div>
-                            </div>
-                            {selectedNews.url && (
-                              <a
-                                href={selectedNews.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-sm text-[var(--brand-main)] dark:text-[var(--brand-purple)] hover:opacity-80 font-medium transition-opacity"
-                              >
-                                <ExternalLink size={16} />
-                                {t('news.source')}
-                              </a>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center justify-center text-center py-16">
-                            <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                              <BookOpen size={32} className="text-gray-400 dark:text-gray-600" />
-                            </div>
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{t('education.noNewsSelected')}</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('education.createNoteFromNewsDesc')}</p>
-                          </div>
-                        )}
+            </div>
+          ) : (
+            /* 학습 화면 - 3단 레이아웃 */
+            <>
+              {/* 메인 학습 영역 */}
+              <div className={cn(
+                'flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900',
+                showNotePanel && 'border-r border-gray-200 dark:border-gray-800'
+              )}>
+                {/* 메시지 영역 */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  {messages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <div className="w-16 h-16 rounded-2xl mb-4 bg-gradient-to-br from-[#4E56C0] to-[#9b5DE0] flex items-center justify-center">
+                        <MessageSquare size={32} className="text-white" />
                       </div>
-                    </div>
-
-                    {/* 오른쪽: 노트 에디터 */}
-                    <div className="w-1/2 overflow-hidden">
-                      <NoteModal
-                        isOpen={true}
-                        onClose={() => {
-                          setNoteViewMode('grid');
-                          setSelectedNewsId(null);
-                          setIsCreatingNote(false);
-                        }}
-                        note={selectedNote && notesData ? notesData.notes.find(n => n.id === selectedNote) || null : null}
-                        newsId={selectedNewsId || undefined}
-                        newsTitle={selectedNews?.title}
-                        newsContent={selectedNews?.content}
-                        newsUrl={selectedNews?.url}
-                        embedded={true}
-                        onDelete={() => {
-                          setNoteViewMode('grid');
-                          setSelectedNote(null);
-                          setSelectedNewsId(null);
-                        }}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  // 그리드 모드 - 토스 스타일
-                  <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 p-6">
-                    <div className="max-w-7xl mx-auto">
-                      <div className="flex items-center justify-between mb-6">
-                        <div>
-                          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('education.notes')}</h2>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">학습 내용을 정리하고 기록하세요</p>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                        {selectedConcept.concept}에 대해 학습해보세요
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mb-6">
+                        질문을 입력하면 AI가 답변을 생성합니다. 대화를 통해 개념을 더 깊이 이해할 수 있습니다.
+                      </p>
+                      {selectedConcept.relatedStocks.length > 0 && (
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">관련 종목:</span>
+                          {selectedConcept.relatedStocks.map((stock) => (
+                            <Badge key={stock} variant="default" size="small">
+                              {stock}
+                            </Badge>
+                          ))}
                         </div>
-                        <Button
-                          variant="primary"
-                          size="medium"
-                          icon={Plus}
-                          onClick={() => setIsCreatingNote(true)}
+                      )}
+                    </div>
+                  ) : (
+                    <div className="max-w-3xl mx-auto space-y-4">
+                      {messages.map((message, index) => (
+                        <div
+                          key={index}
+                          className={cn(
+                            'flex',
+                            message.role === 'user' ? 'justify-end' : 'justify-start'
+                          )}
                         >
-                          {t('education.createNote')}
-                        </Button>
-                      </div>
-                {isNotesLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800 animate-pulse">
-                        <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg mb-3" />
-                        <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded mb-2 w-3/4" />
-                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-2" />
-                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-3 w-5/6" />
-                        <div className="flex gap-2">
-                          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : notesData && notesData.notes && notesData.notes.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {notesData.notes.map((note) => (
-                      <button
-                        key={note.id}
-                        onClick={() => {
-                          setSelectedNote(note.id);
-                          if (note.newsId) {
-                            setSelectedNewsId(note.newsId);
-                            setNoteViewMode('split');
-                          } else {
-                            setNoteViewMode('split');
-                          }
-                        }}
-                        className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800 hover:border-[var(--brand-main)] dark:hover:border-[var(--brand-purple)] transition-all duration-200 cursor-pointer text-left hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
-                      >
-                        <div className="h-32 bg-gray-50 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center">
-                          <BookOpen size={32} strokeWidth={1.5} className="text-gray-400 dark:text-gray-600" />
-                        </div>
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 line-clamp-1">
-                          {note.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">
-                          {stripHtmlAndMarkdown(note.content).substring(0, 100)}
-                        </p>
-                        {note.tags && note.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
-                            {note.tags.slice(0, 3).map((tag) => (
-                              <Badge key={tag} variant="primary" size="small">
-                                {tag}
-                              </Badge>
-                            ))}
+                          <div
+                            className={cn(
+                              'max-w-[80%] rounded-2xl px-4 py-3',
+                              'break-words',
+                              message.role === 'user'
+                                ? 'bg-[#4E56C0] dark:bg-[#9b5DE0] text-white'
+                                : 'bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700'
+                            )}
+                          >
+                            <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                              {message.content}
+                            </div>
                           </div>
-                        )}
-                      </button>
-                    ))}
+                        </div>
+                      ))}
+                      {isStreaming && !streamingMessage && (
+                        <div className="flex justify-start">
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-2xl px-4 py-3 border border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 bg-[#4E56C0] dark:bg-[#9b5DE0] rounded-full animate-bounce" />
+                              <div className="w-2 h-2 bg-[#4E56C0] dark:bg-[#9b5DE0] rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                              <div className="w-2 h-2 bg-[#4E56C0] dark:bg-[#9b5DE0] rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </div>
+
+                {/* 입력 영역 */}
+                <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
+                  <div className="max-w-3xl mx-auto flex items-center gap-3">
+                    <Input
+                      placeholder="질문을 입력하세요..."
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      className="flex-1"
+                      disabled={isStreaming}
+                    />
+                    <Button
+                      variant="primary"
+                      size="medium"
+                      icon={Send}
+                      onClick={handleSendMessage}
+                      disabled={!inputMessage.trim() || isStreaming}
+                    >
+                      전송
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="medium"
+                      icon={showNotePanel ? ChevronRight : FileText}
+                      onClick={() => setShowNotePanel(!showNotePanel)}
+                    >
+                      {showNotePanel ? '노트 닫기' : '노트'}
+                    </Button>
                   </div>
-                ) : (
-                  <div className="bg-white dark:bg-gray-900 rounded-xl p-16 border border-gray-200 dark:border-gray-800">
-                    <div className="flex flex-col items-center justify-center text-center">
-                      <div className="w-20 h-20 rounded-2xl mb-6 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                        <BookOpen size={40} strokeWidth={2} className="text-gray-400 dark:text-gray-600" />
-                      </div>
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('education.noNotes')}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-xs">{t('education.noNotesDescription')}</p>
+                </div>
+              </div>
+
+              {/* 노트 패널 */}
+              {showNotePanel && (
+                <div className="w-96 bg-gray-50 dark:bg-gray-950 overflow-y-auto">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">학습 노트</h3>
+                      <button
+                        onClick={() => setShowNotePanel(false)}
+                        className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                    </div>
+                    <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-800">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        학습한 내용을 노트로 정리해보세요.
+                      </p>
                       <Button
                         variant="primary"
-                        size="medium"
-                        icon={Plus}
-                        onClick={() => setIsCreatingNote(true)}
+                        size="small"
+                        className="w-full"
+                        onClick={() => {
+                          // TODO: 노트 작성 모달 열기
+                        }}
                       >
-                        {t('education.createNote')}
+                        새 노트 작성
                       </Button>
                     </div>
                   </div>
-                )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
-      
-      {/* Learning Modal */}
-      {selectedLearning && (
-        <LearningModal
-          isOpen={!!selectedLearning}
-          onClose={() => setSelectedLearning(null)}
-          concept={selectedLearning.concept}
-          question={selectedLearning.question}
-          relatedStocks={selectedLearning.relatedStocks}
-        />
-      )}
 
-      {/* Note Modal - 기존 노트 편집 */}
-      {selectedNote && notesData && (
+      {/* 노트 모달 */}
+      {showNotesModal && (
         <NoteModal
-          isOpen={!!selectedNote}
-          onClose={() => setSelectedNote(null)}
-          note={notesData.notes.find(n => n.id === selectedNote) || null}
-          onDelete={() => setSelectedNote(null)}
-        />
-      )}
-
-      {/* Note Modal - 새 노트 생성 */}
-      {isCreatingNote && (
-        <NoteModal
-          isOpen={isCreatingNote}
-          onClose={() => setIsCreatingNote(false)}
+          isOpen={showNotesModal}
+          onClose={() => setShowNotesModal(false)}
           note={null}
         />
       )}
@@ -535,17 +390,17 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
   );
 }
 
-export default function EducationPage() {
+export default function FolioPage() {
   return (
     <Suspense fallback={
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="w-8 h-8 border-2 border-[#4E56C0] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-sm text-gray-500">Loading...</p>
         </div>
       </div>
     }>
-      <EducationPageContent />
+      <FolioPageContent />
     </Suspense>
   );
 }
