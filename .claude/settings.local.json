@@ -41,7 +41,8 @@
       "Bash(bash -n:*)",
       "Bash(bash:*)",
       "Bash(find:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

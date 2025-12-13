@@ -103,24 +103,29 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
-        <div className="flex-1 overflow-y-auto">
-          {/* Tabs */}
-          <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
-            <div className="flex items-center gap-1 px-6">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={cn(
-                    'px-4 py-3 text-sm font-medium border-b-2 transition-all duration-200 relative',
-                    activeTab === tab.id
-                      ? 'border-[var(--brand-main)] dark:border-[var(--brand-purple)] text-[var(--brand-main)] dark:text-[var(--brand-purple)] bg-background-hover dark:bg-background-hover font-semibold'
-                      : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-[var(--brand-main)] dark:hover:text-[var(--brand-purple)] hover:border-[var(--brand-light-purple)] dark:hover:border-[var(--brand-purple)]'
-                  )}
-                >
-                  {t(tab.labelKey)}
-                </button>
-              ))}
+        <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950">
+          {/* Tabs - 토스 스타일: 깔끔한 탭바 */}
+          <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+            <div className="max-w-7xl mx-auto px-6">
+              <div className="flex items-center gap-2">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                    className={cn(
+                      'px-4 py-4 text-sm font-semibold transition-all duration-200 relative',
+                      activeTab === tab.id
+                        ? 'text-[var(--brand-main)] dark:text-[var(--brand-purple)]'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    )}
+                  >
+                    {t(tab.labelKey)}
+                    {activeTab === tab.id && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--brand-main)] dark:bg-[var(--brand-purple)] rounded-full" />
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -128,42 +133,46 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
           <div className="flex-1 overflow-hidden">
             {activeTab === 'qa' && (
               <div className="h-full flex flex-col">
-                <div className="flex-1 overflow-hidden grid grid-cols-[320px_1fr] gap-6 p-6">
-                  {/* Question History */}
-                  <div className="border-r border-gray-200 pr-6 overflow-y-auto">
-                    <h3 className="text-sm font-semibold text-text-primary mb-4">{t('education.question.history')}</h3>
-                    <div className="space-y-1.5">
-                      {[
-                        t('education.question.sample.per'),
-                        t('education.question.sample.dividend'),
-                        t('education.question.sample.rsi'),
-                        t('education.question.sample.dividend'),
-                        t('education.question.sample.rsi'),
-                      ].map((q, index) => (
-                        <button
-                          key={index}
-                          className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-700 hover:bg-[#F0FDF4] hover:text-primary-600 transition-all duration-200"
-                        >
-                          {q}
-                        </button>
-                      ))}
+                <div className="flex-1 overflow-hidden grid grid-cols-[280px_1fr] gap-0">
+                  {/* Question History - 토스 스타일 */}
+                  <div className="bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 overflow-y-auto">
+                    <div className="p-6 space-y-4">
+                      <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100">{t('education.question.history')}</h3>
+                      <div className="space-y-1">
+                        {[
+                          t('education.question.sample.per'),
+                          t('education.question.sample.dividend'),
+                          t('education.question.sample.rsi'),
+                          t('education.question.sample.dividend'),
+                          t('education.question.sample.rsi'),
+                        ].map((q, index) => (
+                          <button
+                            key={index}
+                            className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Answer Preview */}
-                  <div className="overflow-y-auto pl-6">
+                  {/* Answer Preview - 토스 스타일 */}
+                  <div className="overflow-y-auto bg-gray-50 dark:bg-gray-950">
                     {answer ? (
-                      <div className="space-y-6">
-                        <div className="prose max-w-none">
-                          <div className="text-gray-700 leading-relaxed whitespace-pre-line space-y-3">
-                            {answer.split('\n\n').map((paragraph, index) => (
-                              <p key={index} className="text-sm leading-7">
-                                {paragraph.trim()}
-                              </p>
-                            ))}
+                      <div className="max-w-3xl mx-auto p-8">
+                        <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-gray-200 dark:border-gray-800 mb-6">
+                          <div className="prose prose-sm max-w-none dark:prose-invert">
+                            <div className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line space-y-4">
+                              {answer.split('\n\n').map((paragraph, index) => (
+                                <p key={index} className="text-sm leading-7">
+                                  {paragraph.trim()}
+                                </p>
+                              ))}
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-3">
                           <Button
                             variant="primary"
                             size="medium"
@@ -178,13 +187,13 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                         </div>
                       </div>
                     ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', maxWidth: '400px', width: '100%', padding: '24px' }}>
-                          <div style={{ width: '80px', height: '80px', backgroundColor: '#F3F4F6', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
-                            <BookOpen size={40} strokeWidth={2} style={{ color: '#D1D5DB' }} />
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center max-w-md p-8">
+                          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                            <BookOpen size={40} strokeWidth={2} className="text-gray-400 dark:text-gray-600" />
                           </div>
-                          <h3 style={{ fontSize: '20px', fontWeight: 700, color: '#111827', marginBottom: '12px', textAlign: 'center' }}>{t('education.question.input')}</h3>
-                          <p style={{ fontSize: '16px', color: '#4B5563', lineHeight: 1.6, textAlign: 'center', maxWidth: '320px' }}>
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('education.question.input')}</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
                             {t('education.question.inputDescription')}
                           </p>
                         </div>
@@ -193,9 +202,9 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                   </div>
                 </div>
 
-                {/* Question Input */}
-                <div className="border-t border-gray-200 bg-white p-4 shrink-0">
-                  <div className="max-w-6xl mx-auto">
+                {/* Question Input - 토스 스타일 */}
+                <div className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 shrink-0">
+                  <div className="max-w-4xl mx-auto">
                     <div className="flex items-center gap-3">
                       <Input
                         placeholder={t('education.question.placeholder')}
@@ -226,30 +235,32 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
             )}
 
             {activeTab === 'dashboard' && (
-              <div className="max-w-6xl mx-auto p-6 space-y-8">
-                <div>
-                  <h2 className="text-xl font-bold text-text-primary mb-6">{t('education.today')}</h2>
-                  {isRecommendationsLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {[1, 2, 3].map((i) => (
-                        <Card key={i} variant="default" className="animate-pulse">
-                          <div className="h-6 bg-background-hover rounded mb-2" />
-                          <div className="h-4 bg-background-hover rounded mb-4" />
-                          <div className="h-6 w-24 bg-background-hover rounded" />
-                        </Card>
-                      ))}
-                    </div>
-                  ) : recommendations.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {recommendations.map((rec) => (
-                      <Card 
-                        key={rec.concept} 
-                        variant="default"
-                        className={cn(
-                          'hover:border-[var(--brand-light-purple)] dark:hover:border-[var(--brand-purple)]',
-                          'transition-all duration-200 cursor-pointer',
-                          'hover:shadow-lg'
-                        )}
+              <div className="max-w-7xl mx-auto p-6 space-y-8">
+                {/* 토스 스타일: 섹션 헤더 */}
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('education.today')}</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">오늘 배울 금융 개념을 선택해보세요</p>
+                </div>
+
+                {isRecommendationsLoading ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800 animate-pulse">
+                        <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded mb-3 w-3/4" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-2 w-full" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-4 w-5/6" />
+                        <div className="flex gap-2">
+                          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : recommendations.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {recommendations.map((rec) => (
+                      <button
+                        key={rec.concept}
                         onClick={() => {
                           setSelectedLearning({
                             concept: rec.concept,
@@ -257,81 +268,93 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                             relatedStocks: rec.relatedStocks,
                           });
                         }}
+                        className={cn(
+                          'bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800',
+                          'transition-all duration-200 cursor-pointer text-left',
+                          'hover:border-[var(--brand-main)] dark:hover:border-[var(--brand-purple)]',
+                          'hover:shadow-lg hover:-translate-y-0.5',
+                          'active:translate-y-0'
+                        )}
                       >
-                          <div className="flex items-start justify-between mb-2">
-                            <h3 className="text-lg font-semibold text-text-primary">{rec.concept}</h3>
-                            <Badge 
-                              variant={
-                                rec.difficulty === 'beginner' ? 'primary' : 
-                                rec.difficulty === 'intermediate' ? 'warning' : 
-                                'error'
-                              }
-                              dot
-                            >
-                              {t(`education.difficulty.${rec.difficulty}`)}
-                            </Badge>
+                        <div className="flex items-start justify-between mb-3">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{rec.concept}</h3>
+                          <Badge
+                            variant={
+                              rec.difficulty === 'beginner' ? 'success' :
+                              rec.difficulty === 'intermediate' ? 'warning' :
+                              'error'
+                            }
+                            size="small"
+                            dot
+                          >
+                            {t(`education.difficulty.${rec.difficulty}`)}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 leading-relaxed line-clamp-2">
+                          {rec.description}
+                        </p>
+                        {rec.relatedStocks.length > 0 && (
+                          <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
+                            {rec.relatedStocks.slice(0, 3).map((stock) => (
+                              <Badge key={stock} variant="default" size="small">
+                                {stock}
+                              </Badge>
+                            ))}
                           </div>
-                          <p className="text-sm text-text-secondary mb-4 leading-relaxed">{rec.description}</p>
-                          {rec.relatedStocks.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5">
-                              {rec.relatedStocks.slice(0, 3).map((stock) => (
-                                <Badge key={stock} variant="default" className="text-xs">
-                                  {stock}
-                                </Badge>
-                              ))}
-                            </div>
-                          )}
-                        </Card>
-                      ))}
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-16 border border-gray-200 dark:border-gray-800 text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                      <BookOpen className="w-8 h-8 text-gray-400 dark:text-gray-600" />
                     </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-text-secondary">{t('education.noRecommendations')}</p>
-                    </div>
-                  )}
-                </div>
+                    <p className="text-gray-600 dark:text-gray-400">{t('education.noRecommendations')}</p>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === 'notes' && (
               <div className="h-full flex flex-col">
                 {noteViewMode === 'split' ? (
-                  // 분할 레이아웃 모드
-                  <div className="flex-1 flex overflow-hidden">
+                  // 분할 레이아웃 모드 - 토스 스타일
+                  <div className="flex-1 flex overflow-hidden bg-gray-50 dark:bg-gray-950">
                     {/* 왼쪽: 뉴스 */}
-                    <div className="w-1/2 border-r border-gray-200 overflow-y-auto p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900">{t('education.selectNews')}</h3>
-                        <Button
-                          variant="secondary"
-                          size="small"
-                          icon={X}
-                          onClick={() => {
-                            setNoteViewMode('grid');
-                            setSelectedNewsId(null);
-                            setIsCreatingNote(false);
-                            setSelectedNote(null);
-                          }}
-                        >
-                          {t('common.close')}
-                        </Button>
-                      </div>
-                      {selectedNewsId && selectedNews ? (
-                        <Card variant="default" className="p-6">
+                    <div className="w-1/2 border-r border-gray-200 dark:border-gray-800 overflow-y-auto bg-white dark:bg-gray-900">
+                      <div className="p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{t('education.selectNews')}</h3>
+                          <Button
+                            variant="secondary"
+                            size="small"
+                            icon={X}
+                            onClick={() => {
+                              setNoteViewMode('grid');
+                              setSelectedNewsId(null);
+                              setIsCreatingNote(false);
+                              setSelectedNote(null);
+                            }}
+                          >
+                            {t('common.close')}
+                          </Button>
+                        </div>
+                        {selectedNewsId && selectedNews ? (
                           <div className="space-y-4">
-                            <h2 className="text-2xl font-bold text-gray-900">{selectedNews.title}</h2>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{selectedNews.title}</h2>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                               <span className="font-medium">{selectedNews.source}</span>
                               <span>·</span>
                               <span>{formatRelativeTime(selectedNews.publishedAt)}</span>
                             </div>
                             {selectedNews.summary && (
-                              <div className="p-4 bg-gray-50 rounded-lg">
-                                <p className="text-sm text-gray-700 leading-relaxed">{selectedNews.summary}</p>
+                              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{selectedNews.summary}</p>
                               </div>
                             )}
-                            <div className="prose max-w-none">
-                              <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+                            <div className="prose prose-sm max-w-none dark:prose-invert">
+                              <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
                                 {selectedNews.content}
                               </div>
                             </div>
@@ -340,23 +363,23 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                                 href={selectedNews.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium"
+                                className="inline-flex items-center gap-2 text-sm text-[var(--brand-main)] dark:text-[var(--brand-purple)] hover:opacity-80 font-medium transition-opacity"
                               >
                                 <ExternalLink size={16} />
                                 {t('news.source')}
                               </a>
                             )}
                           </div>
-                        </Card>
-                      ) : (
-                        <Card variant="default" className="p-12">
-                          <div className="flex flex-col items-center justify-center text-center">
-                            <BookOpen size={48} className="text-gray-400 mb-4" />
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t('education.noNewsSelected')}</h3>
-                            <p className="text-sm text-gray-600">{t('education.createNoteFromNewsDesc')}</p>
+                        ) : (
+                          <div className="flex flex-col items-center justify-center text-center py-16">
+                            <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+                              <BookOpen size={32} className="text-gray-400 dark:text-gray-600" />
+                            </div>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">{t('education.noNewsSelected')}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('education.createNoteFromNewsDesc')}</p>
                           </div>
-                        </Card>
-                      )}
+                        )}
+                      </div>
                     </div>
 
                     {/* 오른쪽: 노트 에디터 */}
@@ -383,11 +406,14 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                     </div>
                   </div>
                 ) : (
-                  // 그리드 모드
-                  <div className="flex-1 overflow-y-auto p-6">
-                    <div className="max-w-6xl mx-auto">
+                  // 그리드 모드 - 토스 스타일
+                  <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-950 p-6">
+                    <div className="max-w-7xl mx-auto">
                       <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-xl font-bold text-gray-900">{t('education.notes')}</h2>
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t('education.notes')}</h2>
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">학습 내용을 정리하고 기록하세요</p>
+                        </div>
                         <Button
                           variant="primary"
                           size="medium"
@@ -400,20 +426,22 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                 {isNotesLoading ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (
-                      <Card key={i} variant="default" className="animate-pulse">
-                        <div className="h-32 bg-background-hover rounded-lg mb-3" />
-                        <div className="h-6 bg-background-hover rounded mb-2" />
-                        <div className="h-4 bg-background-hover rounded mb-3" />
-                      </Card>
+                      <div key={i} className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800 animate-pulse">
+                        <div className="h-32 bg-gray-200 dark:bg-gray-800 rounded-lg mb-3" />
+                        <div className="h-5 bg-gray-200 dark:bg-gray-800 rounded mb-2 w-3/4" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-2" />
+                        <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded mb-3 w-5/6" />
+                        <div className="flex gap-2">
+                          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-800 rounded-md" />
+                        </div>
+                      </div>
                     ))}
                   </div>
                 ) : notesData && notesData.notes && notesData.notes.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {notesData.notes.map((note) => (
-                      <Card 
-                        key={note.id} 
-                        variant="default" 
-                        className="cursor-pointer hover:border-[var(--brand-light-purple)] dark:hover:border-[var(--brand-purple)] transition-all duration-200"
+                      <button
+                        key={note.id}
                         onClick={() => {
                           setSelectedNote(note.id);
                           if (note.newsId) {
@@ -423,36 +451,37 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                             setNoteViewMode('split');
                           }
                         }}
+                        className="bg-white dark:bg-gray-900 rounded-xl p-5 border border-gray-200 dark:border-gray-800 hover:border-[var(--brand-main)] dark:hover:border-[var(--brand-purple)] transition-all duration-200 cursor-pointer text-left hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                       >
-                        <div className="h-32 bg-background-subtle rounded-lg mb-3 flex items-center justify-center">
-                          <BookOpen size={32} strokeWidth={1.5} className="text-text-tertiary" />
+                        <div className="h-32 bg-gray-50 dark:bg-gray-800 rounded-lg mb-3 flex items-center justify-center">
+                          <BookOpen size={32} strokeWidth={1.5} className="text-gray-400 dark:text-gray-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-text-primary mb-2 hover:text-[var(--brand-main)] dark:hover:text-[var(--brand-purple)] transition-colors line-clamp-1">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2 line-clamp-1">
                           {note.title}
                         </h3>
-                        <p className="text-sm text-text-secondary mb-3 line-clamp-2 leading-relaxed">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">
                           {stripHtmlAndMarkdown(note.content).substring(0, 100)}
                         </p>
                         {note.tags && note.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
                             {note.tags.slice(0, 3).map((tag) => (
-                              <Badge key={tag} variant="primary" className="text-xs">
+                              <Badge key={tag} variant="primary" size="small">
                                 {tag}
                               </Badge>
                             ))}
                           </div>
                         )}
-                      </Card>
+                      </button>
                     ))}
                   </div>
                 ) : (
-                  <Card variant="default" className="py-16">
+                  <div className="bg-white dark:bg-gray-900 rounded-xl p-16 border border-gray-200 dark:border-gray-800">
                     <div className="flex flex-col items-center justify-center text-center">
-                      <div className="w-20 h-20 rounded-2xl mb-6 bg-background-subtle flex items-center justify-center">
-                        <BookOpen size={40} strokeWidth={2} className="text-text-tertiary" />
+                      <div className="w-20 h-20 rounded-2xl mb-6 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <BookOpen size={40} strokeWidth={2} className="text-gray-400 dark:text-gray-600" />
                       </div>
-                      <h3 className="text-xl font-bold text-text-primary mb-3">{t('education.noNotes')}</h3>
-                      <p className="text-sm text-text-secondary mb-6 max-w-xs">{t('education.noNotesDescription')}</p>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">{t('education.noNotes')}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 max-w-xs">{t('education.noNotesDescription')}</p>
                       <Button
                         variant="primary"
                         size="medium"
@@ -462,7 +491,7 @@ PER이 낮다고 무조건 좋은 건 아닙니다. 적자 기업은 PER을 계�
                         {t('education.createNote')}
                       </Button>
                     </div>
-                  </Card>
+                  </div>
                 )}
                     </div>
                   </div>
