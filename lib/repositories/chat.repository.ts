@@ -47,7 +47,12 @@ export class ChatRepository extends BaseRepository<Conversation> {
     params?: { limit?: number; offset?: number; search?: string; category?: string }
   ): Promise<ConversationsListResponse> {
     try {
-      return await this.get<ConversationsListResponse>('/conversations', params);
+      // 백엔드는 ConversationListItem[] 배열만 반환하므로 변환 필요
+      const conversations = await this.get<ConversationListItem[]>('/conversations', params);
+      return {
+        conversations: conversations || [],
+        total: conversations?.length || 0, // 백엔드가 total을 제공하지 않으므로 배열 길이 사용
+      };
     } catch (error) {
       console.error('API 호출 실패:', error);
       throw error;
@@ -83,11 +88,14 @@ export class ChatRepository extends BaseRepository<Conversation> {
   }
 
   /**
-   * 메시지 전송 (일반)
+   * 메시지 전송 (일반) - 실제로는 SSE 스트리밍 사용 권장
    */
   async sendMessage(data: SendMessageRequest): Promise<SendMessageResponse> {
     try {
-      return await this.post<SendMessageResponse>('/messages', data);
+      // POST /chat/stream을 사용해서 메시지 전송
+      // 백엔드는 SSE 스트리밍으로만 응답하므로 일반 POST는 지원하지 않음
+      // 대신 streamChat hook을 사용하도록 유도
+      throw new Error('Use SSE streaming (useSendMessageStream hook) instead');
     } catch (error) {
       console.error('API 호출 실패:', error);
       // Fallback: 임시 메시지 생성 (개발용)
@@ -99,7 +107,7 @@ export class ChatRepository extends BaseRepository<Conversation> {
           conversationId,
           userId: 'user_1',
           role: 'assistant',
-          content: '안녕하세요! 질문에 답변드리겠습니다. (Fallback 응답)',
+          content: '안녕하세요! 질문에 답변드리겠습니다. (Fallback 응답 - SSE 스트리밍을 사용해주세요)',
           createdAt: new Date().toISOString(),
         },
       };
@@ -114,10 +122,15 @@ export class ChatRepository extends BaseRepository<Conversation> {
     params?: { limit?: number; before?: string }
   ): Promise<MessagesListResponse> {
     try {
-      return await this.get<MessagesListResponse>(
+      // 백엔드는 Message[] 배열만 반환하므로 변환 필요
+      const messages = await this.get<Message[]>(
         `/conversations/${conversationId}/messages`,
         params
       );
+      return {
+        messages: messages || [],
+        hasMore: false, // 백엔드가 hasMore를 제공하지 않으므로 false로 설정
+      };
     } catch (error: any) {
       // 404는 새 대화라서 메시지가 없는 경우 (정상)
       if (error?.response?.status === 404) {
