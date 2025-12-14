@@ -282,8 +282,8 @@ export function ChatMessage({ message, isStreaming = false, onRegenerate }: Chat
       </div>
 
       {isUser && (
-        <div className={`flex-shrink-0 w-[var(--spacing-8)] h-[var(--spacing-8)] rounded-full bg-gray-200 flex items-center justify-center`}>
-          <User size={sizes.icon.px.md} className="text-gray-600" />
+        <div className={`flex-shrink-0 w-[var(--spacing-8)] h-[var(--spacing-8)] rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center`}>
+          <User size={sizes.icon.px.md} className="text-gray-600 dark:text-gray-300" />
         </div>
       )}
     </div>
