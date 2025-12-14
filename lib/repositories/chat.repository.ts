@@ -47,11 +47,30 @@ export class ChatRepository extends BaseRepository<Conversation> {
     params?: { limit?: number; offset?: number; search?: string; category?: string }
   ): Promise<ConversationsListResponse> {
     try {
-      // 백엔드는 ConversationListItem[] 배열만 반환하므로 변환 필요
-      const conversations = await this.get<ConversationListItem[]>('/conversations', params);
+      // 백엔드 ConversationResponseDto 타입
+      type BackendConversation = {
+        id: string;
+        title: string;
+        lastMessage: string;
+        category?: string;
+        tags: string[];
+        createdAt: string;
+        updatedAt: string;
+      };
+
+      const backendConversations = await this.get<BackendConversation[]>('/conversations', params);
+
+      // 백엔드 DTO를 프론트엔드 타입으로 변환
+      const conversations: ConversationListItem[] = (backendConversations || []).map(c => ({
+        id: c.id,
+        title: c.title,
+        lastMessage: c.lastMessage || '',
+        updatedAt: c.updatedAt,
+      }));
+
       return {
-        conversations: conversations || [],
-        total: conversations?.length || 0, // 백엔드가 total을 제공하지 않으므로 배열 길이 사용
+        conversations,
+        total: conversations.length,
       };
     } catch (error) {
       console.error('API 호출 실패:', error);
@@ -122,14 +141,37 @@ export class ChatRepository extends BaseRepository<Conversation> {
     params?: { limit?: number; before?: string }
   ): Promise<MessagesListResponse> {
     try {
-      // 백엔드는 Message[] 배열만 반환하므로 변환 필요
-      const messages = await this.get<Message[]>(
+      // 백엔드 ChatResponseDto 타입
+      type BackendChatResponse = {
+        conversationId: string;
+        message: {
+          id: string;
+          role: 'user' | 'assistant';
+          content: string;
+          sources: string[];
+          createdAt: string;
+        };
+      };
+
+      const backendMessages = await this.get<BackendChatResponse[]>(
         `/conversations/${conversationId}/messages`,
         params
       );
+
+      // 백엔드 DTO를 프론트엔드 Message 타입으로 변환
+      const messages: Message[] = (backendMessages || []).map(m => ({
+        id: m.message.id,
+        conversationId: m.conversationId,
+        userId: '', // 백엔드가 제공하지 않으므로 빈 문자열
+        role: m.message.role,
+        content: m.message.content,
+        createdAt: m.message.createdAt,
+        sources: m.message.sources.length > 0 ? m.message.sources : undefined,
+      }));
+
       return {
-        messages: messages || [],
-        hasMore: false, // 백엔드가 hasMore를 제공하지 않으므로 false로 설정
+        messages,
+        hasMore: false,
       };
     } catch (error: any) {
       // 404는 새 대화라서 메시지가 없는 경우 (정상)
