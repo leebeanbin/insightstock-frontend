@@ -30,7 +30,12 @@ export function useInfiniteConversations(params?: UseInfiniteConversationsParams
       });
     },
     getNextPageParam: (lastPage, allPages) => {
-      const totalLoaded = allPages.reduce((sum, page) => sum + page.conversations.length, 0);
+      if (!lastPage || !Array.isArray(lastPage.conversations)) {
+        return undefined;
+      }
+      const totalLoaded = allPages.reduce((sum, page) => {
+        return sum + (page?.conversations?.length || 0);
+      }, 0);
       const hasMore = lastPage.total > totalLoaded;
       return hasMore ? allPages.length : undefined;
     },
