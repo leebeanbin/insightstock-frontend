@@ -46,20 +46,6 @@ export class ChatService {
   }
 
   /**
-   * 대화 상세 조회
-   */
-  async getConversation(
-    id: string
-  ): Promise<Conversation & { messages: Message[] }> {
-    // 비즈니스 로직: 유효성 검증 등
-    if (!id) {
-      throw new Error('Conversation ID is required');
-    }
-
-    return await this.repository.getConversation(id);
-  }
-
-  /**
    * 대화 삭제
    */
   async deleteConversation(id: string): Promise<{ message: string }> {

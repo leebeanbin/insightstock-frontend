@@ -79,22 +79,6 @@ export class ChatRepository extends BaseRepository<Conversation> {
   }
 
   /**
-   * 대화 상세 조회
-   */
-  async getConversation(
-    id: string
-  ): Promise<Conversation & { messages: Message[] }> {
-    try {
-      return await this.get<Conversation & { messages: Message[] }>(
-        `/conversations/${id}`
-      );
-    } catch (error) {
-      console.error('API 호출 실패:', error);
-      throw new Error('Failed to fetch conversation. Please check backend connection.');
-    }
-  }
-
-  /**
    * 대화 삭제
    */
   async deleteConversation(id: string): Promise<{ message: string }> {
