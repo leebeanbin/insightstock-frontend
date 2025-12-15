@@ -27,7 +27,29 @@ export class ChatRepository extends BaseRepository<Conversation> {
   ): Promise<Conversation> {
     // Fallback 제거: 실제 API 호출만 사용
     // 임시 ID 생성은 DB에 존재하지 않아 404 에러를 유발함
-    return await this.post<Conversation>('/conversations', data);
+    
+    // 백엔드 ConversationResponseDto 타입
+    type BackendConversationResponse = {
+      id: string;
+      title: string;
+      lastMessage: string;
+      category?: string;
+      tags: string[];
+      createdAt: string;
+      updatedAt: string;
+    };
+    
+    const backendResponse = await this.post<BackendConversationResponse>('/conversations', data);
+    
+    // 백엔드 DTO를 프론트엔드 Conversation 타입으로 변환
+    // userId는 백엔드에서 제공하지 않으므로 빈 문자열 (실제로는 인증에서 가져옴)
+    return {
+      id: backendResponse.id,
+      userId: '', // 백엔드에서 제공하지 않음
+      title: backendResponse.title,
+      createdAt: backendResponse.createdAt,
+      updatedAt: backendResponse.updatedAt,
+    };
   }
 
   /**
