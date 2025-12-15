@@ -19,10 +19,16 @@ export abstract class BaseRepository<T> {
     options?: { validateStatus?: (status: number) => boolean }
   ): Promise<R> {
     const fullPath = this.getPath(path);
-    const response: AxiosResponse<{ success: boolean; data: R }> = await apiClient.get(fullPath, { 
+    const response: AxiosResponse<{ success: boolean; data: R }> = await apiClient.get(fullPath, {
       params,
       validateStatus: options?.validateStatus,
     });
+
+    // 404 응답인 경우 빈 배열/객체 반환
+    if (response.status === 404) {
+      return (Array.isArray(response.data.data) ? [] : null) as R;
+    }
+
     return response.data.data;
   }
 

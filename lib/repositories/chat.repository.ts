@@ -155,11 +155,17 @@ export class ChatRepository extends BaseRepository<Conversation> {
 
       const backendMessages = await this.get<BackendChatResponse[]>(
         `/conversations/${conversationId}/messages`,
-        params
+        params,
+        { validateStatus: (status) => status === 200 || status === 404 }
       );
 
+      // 404 응답이거나 데이터가 없는 경우 빈 배열 반환
+      if (!backendMessages || !Array.isArray(backendMessages)) {
+        return { messages: [], hasMore: false };
+      }
+
       // 백엔드 DTO를 프론트엔드 Message 타입으로 변환
-      const messages: Message[] = (backendMessages || []).map(m => ({
+      const messages: Message[] = backendMessages.map(m => ({
         id: m.message.id,
         conversationId: m.conversationId,
         userId: '', // 백엔드가 제공하지 않으므로 빈 문자열
@@ -179,7 +185,7 @@ export class ChatRepository extends BaseRepository<Conversation> {
         return { messages: [], hasMore: false };
       }
       console.error('API 호출 실패:', error);
-      throw new Error('Failed to fetch messages. Please check backend connection.');
+      return { messages: [], hasMore: false }; // 에러 시에도 빈 배열 반환
     }
   }
 
