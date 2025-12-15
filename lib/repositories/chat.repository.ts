@@ -25,19 +25,9 @@ export class ChatRepository extends BaseRepository<Conversation> {
   async createConversation(
     data: CreateConversationRequest
   ): Promise<Conversation> {
-    try {
-      return await this.post<Conversation>('/conversations', data);
-    } catch (error) {
-      console.error('API 호출 실패:', error);
-      // Fallback: 임시 대화 생성 (개발용)
-      return {
-        id: `conv_${Date.now()}`,
-        userId: 'user_1',
-        title: data.title || 'New Conversation',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-    }
+    // Fallback 제거: 실제 API 호출만 사용
+    // 임시 ID 생성은 DB에 존재하지 않아 404 에러를 유발함
+    return await this.post<Conversation>('/conversations', data);
   }
 
   /**
@@ -101,19 +91,8 @@ export class ChatRepository extends BaseRepository<Conversation> {
       throw new Error('Use SSE streaming (useSendMessageStream hook) instead');
     } catch (error) {
       console.error('API 호출 실패:', error);
-      // Fallback: 임시 메시지 생성 (개발용)
-      const conversationId = data.conversationId || `conv_${Date.now()}`;
-      return {
-        conversationId,
-        message: {
-          id: `msg_${Date.now()}`,
-          conversationId,
-          userId: 'user_1',
-          role: 'assistant',
-          content: '안녕하세요! 질문에 답변드리겠습니다. (Fallback 응답 - SSE 스트리밍을 사용해주세요)',
-          createdAt: new Date().toISOString(),
-        },
-      };
+      // Fallback 제거: 에러를 그대로 전파하여 호출자가 처리하도록 함
+      throw error;
     }
   }
 

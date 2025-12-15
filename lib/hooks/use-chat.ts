@@ -109,16 +109,8 @@ export function useSendMessageStream() {
               setIsStreaming(false);
               setStreamingMessage('');
               resolved = true;
-              // Fallback: 일반 메시지 전송
-              chatService.sendMessage(data)
-                .then((response) => {
-                  queryClient.invalidateQueries({
-                    queryKey: messageKeys.list(response.conversationId),
-                  });
-                  queryClient.invalidateQueries({ queryKey: conversationKeys.lists() });
-                  resolve(response);
-                })
-                .catch(reject);
+              // 타임아웃 시 에러 반환 (fallback 제거)
+              reject(new Error('Request timeout. Please try again.'));
             }
           }, 30000);
 
@@ -192,81 +184,57 @@ export function useSendMessageStream() {
               setIsStreaming(false);
               setStreamingMessage('');
               
-              // Fallback: 일반 메시지 전송
-              chatService.sendMessage(data)
-                .then((response) => {
-                  queryClient.invalidateQueries({
-                    queryKey: messageKeys.list(response.conversationId),
-                  });
-                  queryClient.invalidateQueries({ queryKey: conversationKeys.lists() });
-                  resolve(response);
-                })
-                .catch((err) => {
-                  // 백엔드로 에러 로깅
-                  if (typeof window !== 'undefined') {
-                    import('@/lib/utils/backend-logger').then(({ backendLogger }) => {
-                      backendLogger.error('Fallback message send failed', err instanceof Error ? err : new Error(String(err)));
-                    }).catch(() => {
-                      // 로거 로드 실패 시 무시
-                    });
-                  }
-                  reject(err);
-                });
+              // SSE 연결 실패 시 에러 반환 (fallback 제거)
+              // 임시 conversationId 사용 시 DB에 존재하지 않아 추가 에러 발생 가능
+              reject(new Error('SSE connection failed. Please try again.'));
             }
           };
+          
+          // SSE 연결이 열리지 않은 경우 처리
+          eventSource.onopen = () => {
+            // 연결 성공 시 아무것도 하지 않음 (메시지 수신 대기)
+          };
+          
+          // 타임아웃 처리 (30초)
+          setTimeout(() => {
+            if (!resolved && eventSource.readyState === EventSource.CONNECTING) {
+              eventSource.close();
+              setIsStreaming(false);
+              setStreamingMessage('');
+              resolved = true;
+              reject(new Error('Connection timeout. Please try again.'));
+            }
+          }, 30000);
         });
       } catch (error) {
-        // 백엔드로 로깅 (경고 레벨)
-        if (typeof window !== 'undefined') {
-          import('@/lib/utils/backend-logger').then(({ backendLogger }) => {
-            backendLogger.warn('SSE 초기화 실패, 일반 메시지 전송으로 대체', {
-              metadata: { error: error instanceof Error ? error.message : String(error) },
-            });
-          }).catch(() => {
-            // 로거 로드 실패 시 무시
-          });
-        }
         setIsStreaming(false);
         setStreamingMessage('');
-        
-        // Fallback: 일반 메시지 전송
-        try {
-          const response = await chatService.sendMessage(data);
-          queryClient.invalidateQueries({
-            queryKey: messageKeys.list(response.conversationId),
-          });
-          queryClient.invalidateQueries({ queryKey: conversationKeys.lists() });
-          return response;
-        } catch (err) {
-          // 백엔드로 에러 로깅
-          if (typeof window !== 'undefined') {
-            import('@/lib/utils/backend-logger').then(({ backendLogger }) => {
-              backendLogger.error('Fallback message send failed', err instanceof Error ? err : new Error(String(err)));
-            }).catch(() => {
-              // 로거 로드 실패 시 무시
-            });
-          }
-          throw err;
-        }
+        throw error;
       }
     },
     [isStreaming, queryClient]
   );
 
-  // Cleanup
+  const stopStreaming = useCallback(() => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    setIsStreaming(false);
+    setStreamingMessage('');
+  }, []);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
     };
   }, []);
 
-  return {
-    sendMessage,
-    streamingMessage,
-    isStreaming,
-  };
+  return { sendMessage, streamingMessage, isStreaming, stopStreaming };
 }
 
 /**
