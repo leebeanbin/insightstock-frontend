@@ -8,6 +8,17 @@ AI 기반 금융 학습 플랫폼 프론트엔드 - Next.js 16 with Turbopack
 
 ---
 
+## 🔗 관련 레포
+
+| 레포 | 역할 | 기술 스택 |
+|------|------|-----------|
+| [insightstock-backend](https://github.com/leebeanbin/insightstock-backend) | API 서버 | Node.js · Fastify · PostgreSQL |
+| [insightstock-ai-service](https://github.com/leebeanbin/insightstock-ai-service) | AI 인사이트 마이크로서비스 | Python · FastAPI · Multi-LLM |
+
+> 이 프론트엔드를 실행하려면 **insightstock-backend**가 먼저 실행 중이어야 합니다.
+
+---
+
 ## 🚀 프로젝트 상태
 
 ### ✅ 완료된 기능
@@ -321,6 +332,37 @@ rm -rf .next && pnpm build
 ```
 
 자세한 내용은 [docs/QUICK-START.md](./docs/QUICK-START.md)의 트러블슈팅 섹션을 참조하세요.
+
+---
+
+## 🚀 배포
+
+### Vercel (권장)
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/leebeanbin/insightstock-frontend)
+
+**사전 준비**: `insightstock-backend`와 `insightstock-ai-service`가 먼저 실행 중이어야 합니다.
+
+1. Vercel 대시보드에서 이 레포지토리 연결
+2. 환경 변수 설정:
+
+   | 변수 | 예시 | 설명 |
+   |------|------|------|
+   | `NEXT_PUBLIC_API_URL` | `https://api.your-domain.com` | 백엔드 API 서버 URL |
+   | `NEXT_PUBLIC_WS_URL` | `wss://api.your-domain.com` | WebSocket URL (선택) |
+   | `DATABASE_URL` | `postgresql://user:pass@host:5432/db` | PostgreSQL 연결 문자열 |
+
+3. Deploy 클릭
+
+### 로컬 프로덕션 빌드
+
+```bash
+# 빌드
+pnpm build
+
+# 프로덕션 서버 실행
+pnpm start
+```
 
 ---
 
